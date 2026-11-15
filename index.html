@@ -256,17 +256,6 @@
       flex-direction: column
     }
 
-    .board-header {
-      padding: 25px 30px 19px;
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: center;
-      background: #fcfdfb;
-      border-bottom: 1px solid var(--line)
-    }
-
-
     h1 {
       font-size: 24px;
       letter-spacing: -.7px;
@@ -303,10 +292,6 @@
       display: flex;
       gap: 7px;
       align-items: center
-    }
-
-    .board-actions button {
-      font-size: 12px
     }
 
     .canvas-wrap {
@@ -399,6 +384,21 @@
       stroke-width: 6px;
       stroke-linejoin: round
     }
+
+    .wires .erd-relationship { color: #67766f; --wire-accent: #6949bc; }
+    [data-theme=dark] .wires .erd-relationship { color: #a0b3aa; --wire-accent: #c1adff; }
+    .wires .erd-relationship:is(:hover, :focus-visible, .active, .dragging) { color: var(--wire-accent); outline: none; }
+    .wires .erd-relationship .edge { stroke: currentColor; stroke-width: 2.5; }
+    .wires .erd-relationship.active .edge { stroke-width: 3; }
+    .wires .erd-endpoints { pointer-events: none; }
+    .wires .erd-label rect { fill: var(--surface); stroke: var(--line); pointer-events: all; cursor: grab; }
+    .wires .erd-label text { fill: var(--ink); pointer-events: none; }
+    .wires .erd-relationship:is(:hover, :focus-visible, .active, .dragging) .erd-label rect {
+      fill: color-mix(in srgb, var(--surface) 92%, var(--wire-accent));
+      stroke: currentColor;
+    }
+    .canvas-wrap.dragging-erd-label, .wires .erd-relationship.dragging .erd-label rect { cursor: grabbing; }
+    .canvas-wrap.dragging-erd-label .inspector { visibility: hidden; }
 
     .node {
       position: absolute;
@@ -1055,10 +1055,6 @@
     }
 
     @media(min-width:1600px) {
-      .board-header {
-        padding: 30px 36px 24px
-      }
-
       .sidebar {
         padding-top: 31px
       }
@@ -1078,14 +1074,6 @@
       }
 
       .brand span:last-child {
-        display: none
-      }
-
-      .board-header {
-        padding: 20px
-      }
-
-      .board-actions .optional {
         display: none
       }
 
@@ -1153,29 +1141,8 @@
         gap: 0
       }
 
-      .board-header {
-        padding: 16px;
-        align-items: flex-start;
-        gap: 10px
-      }
-
       h1 {
         font-size: 20px
-      }
-
-      .board-actions {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        max-width: 145px
-      }
-
-      .board-actions button {
-        font-size: 10px;
-        padding: 7px
-      }
-
-      .board-actions .optional {
-        display: none
       }
 
       .breadcrumb {
@@ -2311,16 +2278,6 @@
         font-size: 9px
       }
 
-      .board-actions {
-        max-width: 220px;
-        flex-wrap: wrap;
-        justify-content: flex-end
-      }
-
-      .board-header>div:first-child {
-        min-width: 0
-      }
-
       .title-button h1 {
         overflow-wrap: anywhere
       }
@@ -2370,10 +2327,6 @@
 
       .shape-picker {
         grid-template-columns: repeat(2, minmax(0, 1fr))
-      }
-
-      .board-actions {
-        max-width: 145px
       }
 
       .template-dialog .dialog-actions {
@@ -2691,7 +2644,7 @@
       --shadow: 0 8px 32px #0004
     }
 
-    [data-theme=dark] :is(header, .sidebar, .board-header, .canvas-toolbar, .inspector, .zoom-control, dialog, .scan-footer, .docs-toolbar, .mockup-bar) {
+    [data-theme=dark] :is(header, .sidebar, .canvas-toolbar, .inspector, .zoom-control, dialog, .scan-footer, .docs-toolbar, .mockup-bar) {
       background: var(--paper);
       border-color: var(--line)
     }
@@ -3397,7 +3350,6 @@
     .focus-mode>header,
     .focus-mode>.sidebar,
     .focus-mode>.workspace-backdrop,
-    .focus-mode .board-header,
     .focus-mode .mockup-bar {
       display: none !important
     }
@@ -3417,6 +3369,7 @@
       height: 100%
     }
 
+    .focus-mode #board-actions,
     .focus-mode .canvas-toolbar,
     .focus-mode .page-info,
     .focus-mode .canvas-hint {
@@ -3992,9 +3945,10 @@
       --workspace-width: 236px;
       grid-template-rows: var(--appbar-height) minmax(0, 1fr);
     }
-    :root header { padding: 0 20px; background: var(--surface); }
+    :root #app-bar { padding: 0 20px; gap: 16px; background: var(--surface); }
     .top-menu, .header-actions { gap: 8px; }
-    .header-actions { max-width: none; overflow: visible; }
+    #app-bar :is(.top-menu, .header-actions) { flex: none; }
+    .header-actions { margin-inline-start: auto; max-width: none; overflow: visible; }
     .header-actions button { min-height: 36px; padding: 7px 10px; font-size: 13px; white-space: nowrap; }
     .header-actions .label { display: inline; }
     #mobile-menu { width: 36px; margin-right: 0; border-color: transparent; }
@@ -4065,31 +4019,43 @@
       margin-top: 0;
     }
 
-    :root .board-header {
-      padding: 13px 20px;
-      gap: 10px 20px;
-      background: var(--surface);
-      flex: 0 0 auto;
+    .board-heading {
+      flex: 0 1 520px;
+      min-width: 0;
+      padding-inline-start: 16px;
+      border-inline-start: 1px solid var(--line);
     }
-    .board-heading { min-width: 0; }
     .title-button { max-width: 100%; gap: 8px; }
     .title-button h1 {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      font-size: 22px;
+      font-size: 17px;
       line-height: 1.25;
       letter-spacing: -.4px;
     }
     .title-button :is(.icon, .library-icon) { color: var(--muted); opacity: 1; width: 15px; height: 15px; }
-    .board-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; margin-top: 4px; }
-    .board-meta, :root .board-subtitle { color: var(--muted); font-size: 12px; }
-    .board-subtitle { margin: 0; font-variant-numeric: tabular-nums; }
-    .board-actions { flex-wrap: wrap; max-width: none; gap: 5px; justify-content: flex-end; }
-    .board-actions button { min-height: 36px; padding: 6px 10px; white-space: nowrap; }
+    .board-meta { display: flex; align-items: baseline; gap: 0 5px; margin-top: 1px; white-space: nowrap; }
+    .board-meta, :root .board-subtitle { color: var(--muted); font-size: 11px; }
+    :root .board-subtitle { position: static; max-width: none; overflow: hidden; text-overflow: ellipsis; margin: 0; font-variant-numeric: tabular-nums; }
+    .canvas-wrap > #board-actions {
+      position: absolute;
+      inset: 12px 16px auto auto;
+      z-index: 4;
+      max-width: calc(100% - 82px);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--panel-shadow);
+    }
+    .canvas-wrap > .page-info { top: auto; bottom: 64px; }
+    #board-actions button { min-height: 36px; padding: 6px 9px; font-size: 12px; white-space: nowrap; }
     .board-actions :is(.history-button, #page-layout-button) .icon { width: 16px; height: 16px; }
-    .board-actions .history-button { display: inline-flex; width: 36px; padding: 0; }
-    .board-actions #sql-button:not([hidden]) { display: inline-flex; }
+    #board-actions .history-button { display: inline-flex; width: 36px; padding: 0; }
     .board-actions #add-button { margin-inline-start: 4px; }
 
     .canvas-wrap {
@@ -4160,33 +4126,85 @@
 
     @media (max-width: 750px) {
       .app { --appbar-height: 54px; }
-      :root header { padding: 0 10px; }
+      :root #app-bar { padding: 0 10px; gap: 8px; }
       .top-menu, .header-actions { gap: 4px; }
       #workspace-menu { right: 10px; }
       :root .sidebar { top: var(--appbar-height); }
       .workspace-backdrop:not([hidden]) { top: var(--appbar-height); }
-      :root .board-header { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
-      .board-heading { width: 100%; }
-      .title-button h1 { font-size: 20px; }
-      .board-actions { width: 100%; justify-content: flex-start; }
-      .board-actions #add-button { margin-inline-start: auto; }
+      #app-bar .brand { display: none; }
+      .board-heading { padding-inline-start: 0; border: 0; }
+      .title-button h1 { font-size: 16px; }
+      #app-bar .header-actions #new-board { width: 36px; padding: 0; }
+      #new-board .label { display: none; }
+      #save-status[data-state=saved] { display: none; }
+      .canvas-wrap > #board-actions { inset: 64px 10px auto auto; max-width: calc(100% - 20px); }
       .canvas-toolbar { left: 10px; top: 10px; flex-direction: row; max-height: none; max-width: calc(100% - 20px); overflow: auto; }
       .canvas-toolbar button { flex: 0 0 36px; }
       .tool-separator { flex: 0 0 1px; height: auto; margin: 5px 2px; }
       .canvas-footer { left: 10px; right: 10px; bottom: 10px; }
       .canvas-hint { display: none; }
       .canvas-hint[data-tool=link] { display: flex; }
-      .canvas-wrap > .page-info { top: 62px; }
       .app:not(.focus-mode) .inspector { top: 62px; max-height: calc(100% - 126px); }
     }
 
     @media (max-width: 420px) {
       .brand-mark { display: none; }
-      .board-actions button { padding-inline: 8px; }
-      .board-actions .history-button { padding-inline: 0; }
+      .board-meta #mode-name, .board-meta [aria-hidden] { display: none; }
+      #board-actions button { padding-inline: 7px; }
       .header-actions #new-board { gap: 4px; }
       .save-indicator[data-state=error] { max-width: 54px; font-size: 10px; line-height: 1.15; }
     }
+
+    #inspector {
+      left: var(--inspector-x, 12px);
+      top: var(--inspector-y, 12px);
+      right: auto;
+      width: 280px;
+      max-width: var(--inspector-width, calc(100% - 24px));
+      max-height: min(420px, var(--inspector-height, calc(100% - 24px)));
+      overflow: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      scrollbar-width: thin;
+      border-color: var(--control-line);
+    }
+
+    #inspector .inspector-header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      min-height: 44px;
+      padding: 6px 12px;
+      background: var(--panel);
+    }
+
+    #inspector .inspector-header button { min-width: 32px; min-height: 32px; }
+    #inspector .inspector-body { padding: 12px; }
+
+    #inspector.erd-toolbar {
+      width: max-content;
+      overflow: visible;
+      padding: 4px;
+    }
+
+    .erd-toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; }
+    .erd-toolbar-actions button { min-width: 34px; min-height: 34px; padding: 4px 7px; }
+    :root .erd-toolbar-actions select { width: auto; min-height: 34px; padding: 4px 7px; font-size: 11px; }
+    .erd-end-picker { position: relative; }
+    .erd-end-picker summary {
+      display: flex; align-items: center; gap: 5px; min-height: 34px; padding: 4px 7px;
+      border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; list-style: none;
+    }
+    .erd-end-picker summary::-webkit-details-marker { display: none; }
+    .erd-end-picker summary:hover, .erd-end-picker[open] summary { background: var(--surface-hover); }
+    .erd-marker-icon { display: block; width: 27px; height: 16px; }
+    .erd-marker-menu {
+      position: absolute; z-index: 2; inset: calc(100% + 8px) auto auto 0;
+      display: grid; grid-template-columns: repeat(3, 34px); gap: 4px; padding: 5px;
+      border: 1px solid var(--control-line); border-radius: 8px; background: var(--surface); box-shadow: var(--panel-shadow);
+    }
+    .erd-marker-menu button { padding: 2px; }
+    .erd-marker-menu button[aria-pressed=true] { color: var(--selected-ink); background: var(--pale); border-color: var(--ring); }
 
     @media (pointer: coarse) {
       .save-indicator:not([data-state=error]) { display: none; }
@@ -4410,18 +4428,25 @@
 
 <body>
   <div class="app" id="app-root">
-    <header>
+    <header id="app-bar">
       <div class="top-menu">
         <button class="ghost mobile-toggle" id="mobile-menu" aria-label="Toggle workspace" aria-controls="sidebar"
           aria-expanded="true" data-icon="sidebar"></button>
         <div class="brand"><span class="brand-mark" data-icon="brand" aria-hidden="true"></span>Forma</div>
+      </div>
+      <div class="board-heading">
+        <button class="title-button" id="rename-board" title="Rename board">
+          <h1 id="board-title"></h1><span data-icon="edit"></span>
+        </button>
+        <div class="board-meta"><span id="mode-name"></span><span aria-hidden="true">·</span>
+          <span class="board-subtitle" id="board-subtitle"></span></div>
       </div>
       <div class="header-actions">
         <span class="save-indicator" id="save-status" role="status" data-state="saved">Saved locally</span>
         <button class="ghost" id="theme-toggle" aria-label="Switch editor theme">Theme</button>
         <button id="workspace-menu-toggle" popovertarget="workspace-menu" data-icon="more" aria-label="Workspace actions"
           title="Workspace actions"></button>
-        <button id="new-board" data-icon="plus">New board</button>
+        <button id="new-board" data-icon="plus" aria-label="New board" title="New board"><span class="label">New board</span></button>
       </div>
       <div id="workspace-menu" popover role="group" aria-label="Workspace actions">
         <button id="templates-button" data-icon="image">Templates</button>
@@ -4451,27 +4476,19 @@
     <button id="workspace-backdrop" class="workspace-backdrop" aria-label="Close workspace navigation"
       tabindex="-1" hidden></button>
     <main class="main">
-      <div class="board-header">
-        <div class="board-heading">
-          <button class="title-button" id="rename-board" title="Rename board">
-            <h1 id="board-title"></h1><span data-icon="edit"></span>
-          </button>
-          <div class="board-meta"><span id="mode-name"></span><span aria-hidden="true">·</span>
-            <span class="board-subtitle" id="board-subtitle"></span></div>
-        </div>
-        <div class="board-actions"><button class="ghost history-button" id="undo-button" title="Undo (Ctrl+Z)" aria-label="Undo"
-            data-icon="undo"></button><button class="ghost history-button" id="redo-button" title="Redo (Ctrl+Shift+Z)"
-            aria-label="Redo" data-icon="redo"></button><button id="page-layout-button" title="Page size and background"
-            data-icon="fit">Page</button><button id="reflow-mind-button"
-            title="Space mind-map cards to fit their full content">Reflow</button><button id="documentation-button"
-            title="Generate documentation from this codebase scan" data-icon="code" hidden>Documentation</button><button
-            id="sql-button" class="optional" data-icon="code">Import SQL</button><button class="primary" id="add-button"
-            data-icon="plus">Add idea</button></div>
-      </div>
       <div id="diagram-bar" class="diagram-bar" hidden></div>
       <div id="mockup-bar" class="mockup-bar" hidden></div>
       <div class="canvas-wrap" id="canvas" tabindex="0"
         aria-label="Board canvas">
+        <div class="board-actions" id="board-actions" role="group" aria-label="Board actions"><button class="ghost history-button" id="undo-button" title="Undo (Ctrl+Z)" aria-label="Undo"
+            data-icon="undo"></button><button class="ghost history-button" id="redo-button" title="Redo (Ctrl+Shift+Z)"
+            aria-label="Redo" data-icon="redo"></button><button id="page-layout-button" title="Page size and background"
+            data-icon="fit">Page</button><button id="reflow-mind-button"
+            title="Rearrange cards to fit their content">Reflow</button><button id="documentation-button"
+            title="Generate documentation from this codebase scan" data-icon="code" hidden>Documentation</button><button
+            id="sql-button" hidden data-icon="code">Import SQL</button><button
+            id="create-table-sql-button" data-icon="code" hidden>Create Table (SQL)</button><button class="primary" id="add-button"
+            data-icon="plus">Add idea</button></div>
         <div class="world" id="world">
           <div id="page-frame" hidden></div>
           <div id="elements"></div><svg class="wires" id="wires" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -4563,6 +4580,35 @@
       if (event.target.closest('button')) $('workspace-menu').hidePopover();
     }, true);
     const LINE_STYLES = { solid: 'Solid', dashed: 'Dashed', dotted: 'Dotted' };
+    const ERD_CARDINALITIES = {
+      '1:1': { label: 'One-to-One (1:1)', ends: ['one', 'one'] },
+      '1:N': { label: 'One-to-Many (1:N)', ends: ['one', 'many'] },
+      'N:M': { label: 'Many-to-Many (N:M)', ends: ['many', 'many'] },
+      '0:1': { label: 'Zero-to-One (0:1)', ends: ['one', 'optionalOne'] },
+      '0:N': { label: 'Zero-to-Many (0:N)', ends: ['one', 'optionalMany'] }
+    };
+    function erdCardinality(value) {
+      return Object.hasOwn(ERD_CARDINALITIES, value) ? value : '1:N';
+    }
+    const ERD_ENDPOINTS = {
+      optionalOne: 'Zero or one', one: 'Exactly one', optionalMany: 'Zero or many', many: 'One or many',
+      arrow: 'Arrow', circle: 'Circle', diamond: 'Diamond', reverseArrow: 'Reverse arrow', none: 'None'
+    };
+    function erdEnds(edge) {
+      const [source, target] = ERD_CARDINALITIES[erdCardinality(edge.cardinality)].ends;
+      return [Object.hasOwn(ERD_ENDPOINTS, edge.fromMarker) ? edge.fromMarker : source,
+        Object.hasOwn(ERD_ENDPOINTS, edge.toMarker) ? edge.toMarker : target];
+    }
+    function erdEndpointOptions(selected) {
+      return Object.entries(ERD_ENDPOINTS).map(([value, label]) =>
+        `<option value="${value}"${value === selected ? ' selected' : ''}>${label}</option>`).join('');
+    }
+    function erdCardinalityCaption(edge, ends) {
+      const legacy = ERD_CARDINALITIES[erdCardinality(edge.cardinality)];
+      if (ends[0] === legacy.ends[0] && ends[1] === legacy.ends[1]) return legacy.label;
+      const preset = Object.values(ERD_CARDINALITIES).find(card => card.ends[0] === ends[0] && card.ends[1] === ends[1]);
+      return preset?.label ?? ends.map(end => ERD_ENDPOINTS[end]).join(' · ');
+    }
     function connectionLineStyle(connection) {
       const { lineStyle, dashed } = connection;
       if (typeof lineStyle === 'string' && Object.hasOwn(LINE_STYLES, lineStyle)) return lineStyle;
@@ -5167,7 +5213,7 @@
       ];
       map.edges = [['root', 'a'], ['root', 'b'], ['root', 'c'], ['root', 'd'], ['c', 'e'], ['c', 'f']].map(([from, to]) => ({ id: uid(), from, to, label: '' })); const users = { id: uid(), x: 90, y: 100, label: 'users', fields: [field('id', 'BIGINT UNSIGNED', true), field('name', 'VARCHAR(100)'), field('email', 'VARCHAR(255)'), field('created_at', 'TIMESTAMP', false, true)] }, projects = { id: uid(), x: 470, y: 65, label: 'projects', fields: [field('id', 'BIGINT UNSIGNED', true), field('user_id'), field('title', 'VARCHAR(255)'), field('status', 'VARCHAR(30)'), field('created_at', 'TIMESTAMP', false, true)] }, tasks = { id: uid(), x: 850, y: 105, label: 'tasks', fields: [field('id', 'BIGINT UNSIGNED', true), field('project_id'), field('title', 'VARCHAR(255)'), field('completed', 'BOOLEAN'), field('due_at', 'DATETIME', false, true)] }, notes = { id: uid(), x: 470, y: 410, label: 'notes', fields: [field('id', 'BIGINT UNSIGNED', true), field('project_id'), field('body', 'TEXT')] }; const erd = { id: uid(), name: 'Sample database', mode: 'erd', nodes: [users, projects, tasks, notes], edges: [{ id: uid(), from: users.id, to: projects.id, fromField: users.fields[0].id, toField: projects.fields[1].id, cardinality: '1:N', label: '' }, { id: uid(), from: projects.id, to: tasks.id, fromField: projects.fields[0].id, toField: tasks.fields[1].id, cardinality: '1:N', label: '' }, { id: uid(), from: projects.id, to: notes.id, fromField: projects.fields[0].id, toField: notes.fields[1].id, cardinality: '1:N', label: '' }], view: { x: 0, y: 0, z: 1 }, updated: Date.now() }; return { version: 1, active: map.id, boards: [map, erd] } }
     let workspace, storageAvailable = true; try { const saved = localStorage.getItem(KEY); workspace = saved ? validateWorkspace(JSON.parse(saved)) : sampleWorkspace() } catch (e) { workspace = sampleWorkspace(); storageAvailable = false } let board = workspace.boards.find(b => b.id === workspace.active) || workspace.boards[0], selected = null, tool = 'select', linkSource = null, space = false, history = [], future = [], drag = null, toastTimer, saveTimer; const canvas = $('canvas'), world = $('world');
-    function validateWorkspace(w) { if (!w || w.version !== 1 || !Array.isArray(w.boards) || !w.boards.length || w.boards.length > 200) throw Error('Invalid workspace. Please choose a Forma JSON backup.'); const ids = new Set; for (const b of w.boards) { if (!b || typeof b.id !== 'string' || ids.has(b.id) || typeof b.name !== 'string' || !['mind', 'erd', 'design'].includes(b.mode) || !Array.isArray(b.nodes) || !Array.isArray(b.edges) || b.nodes.length > 3000 || b.edges.length > 10000) throw Error('Invalid board data.'); ids.add(b.id); b.name = b.name.slice(0, 150); const ni = new Set, fi = new Map; for (const n of b.nodes) { if (!n || typeof n.id !== 'string' || ni.has(n.id) || typeof n.label !== 'string' || !Number.isFinite(n.x) || !Number.isFinite(n.y) || Math.abs(n.x) > (b.mode === 'mind' ? 10000000 : 100000) || Math.abs(n.y) > (b.mode === 'mind' ? 10000000 : 100000)) throw Error('Invalid node data.'); ni.add(n.id); n.label = n.label.slice(0, 500); n.note = String(n.note || '').slice(0, NOTE_LIMIT); if (b.mode === 'mind') validateIdeaRichText(n); n.color = /^#[0-9a-f]{6}$/i.test(n.color) ? n.color : colors[0]; n.root = !!n.root; if (b.mode === 'erd') { if (!Array.isArray(n.fields) || n.fields.length > 500) throw Error('Invalid table columns.'); const fs = new Set; for (const f of n.fields) { if (!f || typeof f.id !== 'string' || fs.has(f.id) || typeof f.name !== 'string' || typeof f.type !== 'string') throw Error('Invalid column data.'); fs.add(f.id); f.name = f.name.slice(0, 150); f.type = f.type.slice(0, 500); f.pk = !!f.pk; f.nullable = !!f.nullable } fi.set(n.id, fs) } } const ei = new Set; for (const e of b.edges) { if (!e || typeof e.id !== 'string' || ei.has(e.id) || !ni.has(e.from) || !ni.has(e.to)) throw Error('Invalid relationship data.'); ei.add(e.id); e.label = String(e.label || '').slice(0, 150); e.lineStyle = connectionLineStyle(e); if (b.mode === 'erd') { if (!fi.get(e.from).has(e.fromField) || !fi.get(e.to).has(e.toField)) throw Error('A relationship references a missing column.'); e.cardinality = ['1:N', '1:1', 'N:M'].includes(e.cardinality) ? e.cardinality : '1:N' } } b.view = b.view && Number.isFinite(b.view.x) && Number.isFinite(b.view.y) && Number.isFinite(b.view.z) ? { x: b.view.x, y: b.view.y, z: Math.max(.15, Math.min(2, b.view.z)) } : { x: 0, y: 0, z: 1 }; b.updated = Number.isFinite(b.updated) ? b.updated : Date.now(); normalizeCanvasBoard(b) } w.active = ids.has(w.active) ? w.active : w.boards[0].id; return w }
+    function validateWorkspace(w) { if (!w || w.version !== 1 || !Array.isArray(w.boards) || !w.boards.length || w.boards.length > 200) throw Error('Invalid workspace. Please choose a Forma JSON backup.'); const ids = new Set; for (const b of w.boards) { if (!b || typeof b.id !== 'string' || ids.has(b.id) || typeof b.name !== 'string' || !['mind', 'erd', 'design'].includes(b.mode) || !Array.isArray(b.nodes) || !Array.isArray(b.edges) || b.nodes.length > 3000 || b.edges.length > 10000) throw Error('Invalid board data.'); ids.add(b.id); b.name = b.name.slice(0, 150); const ni = new Set, fi = new Map; for (const n of b.nodes) { if (!n || typeof n.id !== 'string' || ni.has(n.id) || typeof n.label !== 'string' || !Number.isFinite(n.x) || !Number.isFinite(n.y) || Math.abs(n.x) > (b.mode === 'mind' ? 10000000 : 100000) || Math.abs(n.y) > (b.mode === 'mind' ? 10000000 : 100000)) throw Error('Invalid node data.'); ni.add(n.id); n.label = n.label.slice(0, 500); n.note = String(n.note || '').slice(0, NOTE_LIMIT); if (b.mode === 'mind') validateIdeaRichText(n); n.color = /^#[0-9a-f]{6}$/i.test(n.color) ? n.color : colors[0]; n.root = !!n.root; if (b.mode === 'erd') { if (!Array.isArray(n.fields) || n.fields.length > 500) throw Error('Invalid table columns.'); const fs = new Set; for (const f of n.fields) { if (!f || typeof f.id !== 'string' || fs.has(f.id) || typeof f.name !== 'string' || typeof f.type !== 'string') throw Error('Invalid column data.'); fs.add(f.id); f.name = f.name.slice(0, 150); f.type = f.type.slice(0, 500); f.pk = !!f.pk; f.nullable = !!f.nullable } fi.set(n.id, fs) } } const ei = new Set; for (const e of b.edges) { if (!e || typeof e.id !== 'string' || ei.has(e.id) || !ni.has(e.from) || !ni.has(e.to)) throw Error('Invalid relationship data.'); ei.add(e.id); e.label = String(e.label || '').slice(0, 150); e.lineStyle = connectionLineStyle(e); if (b.mode === 'erd') { if (!fi.get(e.from).has(e.fromField) || !fi.get(e.to).has(e.toField)) throw Error('A relationship references a missing column.'); e.cardinality = erdCardinality(e.cardinality); if (!isERDLabelPosition(e.labelPosition)) delete e.labelPosition; if (!Object.hasOwn(ERD_ENDPOINTS, e.fromMarker)) delete e.fromMarker; if (!Object.hasOwn(ERD_ENDPOINTS, e.toMarker)) delete e.toMarker } } b.view = b.view && Number.isFinite(b.view.x) && Number.isFinite(b.view.y) && Number.isFinite(b.view.z) ? { x: b.view.x, y: b.view.y, z: Math.max(.15, Math.min(2, b.view.z)) } : { x: 0, y: 0, z: 1 }; b.updated = Number.isFinite(b.updated) ? b.updated : Date.now(); normalizeCanvasBoard(b) } w.active = ids.has(w.active) ? w.active : w.boards[0].id; return w }
     function toast(s) { $('toast').textContent = s; $('toast').classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('show'), 3600) }
     function updateSaveStatus(saved) {
       const status = $('save-status');
@@ -5176,7 +5222,7 @@
       status.title = saved ? 'Saved in this browser' : 'Export JSON to keep a backup';
     }
     function persist() { workspace.active = board.id; board.updated = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(workspace)); storageAvailable = true; updateSaveStatus(true) } catch (e) { storageAvailable = false; updateSaveStatus(false); toast('Browser storage is unavailable or full. Export JSON to keep your work.') } }
-    function changed() { persist(); renderList(); updateCounts() } function checkpoint() { history.push(clone(board)); if (history.length > 70) history.shift(); future = []; updateHistory() } function updateHistory() { $('undo-button').disabled = !history.length; $('redo-button').disabled = !future.length } function undo() { if (!history.length) return; future.push(clone(board)); restoreBoard(history.pop()); toast('Undone') } function redo() { if (!future.length) return; history.push(clone(board)); restoreBoard(future.pop()); toast('Redone') } function restoreBoard(b) { endCanvasElementDrag(); workspace.boards[workspace.boards.findIndex(x => x.id === board.id)] = b; board = b; selected = null; linkSource = null; render(); changed() }
+    function changed() { persist(); renderList(); updateCounts() } function checkpoint() { history.push(clone(board)); if (history.length > 70) history.shift(); future = []; updateHistory() } function updateHistory() { $('undo-button').disabled = !history.length; $('redo-button').disabled = !future.length } function undo() { if (!history.length) return; future.push(clone(board)); restoreBoard(history.pop()); toast('Undone') } function redo() { if (!future.length) return; history.push(clone(board)); restoreBoard(future.pop()); toast('Redone') } function restoreBoard(b) { endERDLabelDrag(); endCanvasElementDrag(); workspace.boards[workspace.boards.findIndex(x => x.id === board.id)] = b; board = b; selected = null; linkSource = null; render(); changed() }
     function renderList() { const q = $('board-search').value.trim().toLowerCase(); $('board-count').textContent = workspace.boards.length; $('board-list').innerHTML = workspace.boards.filter(b => b.name.toLowerCase().includes(q)).map(b => `<button class="board-item ${b.id === board.id ? 'active' : ''}" data-board="${esc(b.id)}"><span class="board-icon">${ico(b.mode === 'erd' ? 'table' : b.mode === 'design' ? 'image' : 'map')}</span><span class="board-copy"><span class="title">${esc(b.name)}</span><small>${b.mockup ? 'Web app mockup' : boardModeLabel(b.mode)} · ${boardNodeCount(b)} ${b.mode === 'mind' ? 'ideas' : b.mode === 'design' ? 'objects' : 'tables'}</small></span></button>`).join('') || '<p class="muted" style="padding:10px">No boards found.</p>' }
     function itemCount(count, singular, plural = singular + 's') {
       return count + ' ' + (count === 1 ? singular : plural);
@@ -5185,7 +5231,7 @@
       const count = itemCount(boardNodeCount(board), board.mode === 'mind' ? 'idea' : 'table');
       $('board-subtitle').textContent = count + ' · ' + itemCount(board.edges.length, 'connection');
     }
-    function setBoard(id) { endCanvasElementDrag(); board = workspace.boards.find(x => x.id === id) || board; selected = null; history = []; future = []; setTool('select'); render(); persist(); $('sidebar').classList.remove('open'); requestAnimationFrame(() => fit()) }
+    function setBoard(id) { endERDLabelDrag(); endCanvasElementDrag(); board = workspace.boards.find(x => x.id === id) || board; selected = null; history = []; future = []; setTool('select'); render(); persist(); $('sidebar').classList.remove('open'); requestAnimationFrame(() => fit()) }
     function isFK(n, f) { return board.edges.some(e => e.to === n.id && e.toField === f.id) }
     function renderNodes() { $('nodes').innerHTML = board.nodes.map(n => { const sel = selected?.type === 'node' && selected.id === n.id ? ' selected' : ''; const src = linkSource === n.id ? ' link-source' : ''; if (board.mode === 'mind') { const layout = mindCardLayout(n); return `<div class="node mind-node ${n.root ? 'root' : ''}${sel}${src}" data-kind="${esc(n.kind || 'idea')}" style="width:${layout.w}px;left:${n.x}px;top:${n.y}px;--accent:${esc(n.color || colors[0])}" data-node="${esc(n.id)}" tabindex="0" role="button" aria-label="Idea: ${esc(mindCardTitle(n))}"><div class="node-title">${layout.formattedTitle ? formattedNoteMarkup(layout.formattedTitle) : layout.titleLines.map(esc).join('\n')}</div>${n.note ? `<div class="node-note">${layout.formattedNote ? formattedNoteMarkup(layout.formattedNote) : layout.noteLines.map(esc).join('\n')}</div>` : ''}${mindCardImageMarkup(layout.images)}</div>` } return `<div class="node table-node${sel}${src}" style="left:${n.x}px;top:${n.y}px" data-node="${esc(n.id)}" tabindex="0" role="button" aria-label="Table: ${esc(n.label)}"><div class="table-head">${ico('table')}${esc(n.label || 'untitled_table')}</div><div class="table-fields">${n.fields.map(f => `<div class="table-field" data-field="${esc(f.id)}"><span class="key-tag ${!f.pk && isFK(n, f) ? 'fk' : ''}">${f.pk ? 'PK' : isFK(n, f) ? 'FK' : '·'}</span><span class="field-name">${esc(f.name)}</span><span class="field-type" title="${esc(f.type)}${f.nullable ? ' NULL' : ' NOT NULL'}">${esc(f.type)}</span></div>`).join('')}</div><div class="table-foot">${n.fields.length} columns</div></div>` }).join(''); $('empty-state').hidden = !!board.nodes.length; $('empty-text').textContent = board.mode === 'mind' ? 'Add an idea to start the mind map.' : 'Add a table or import a MySQL schema.' }
     // The canvas and SVG export share wrapping, so cards always contain the full text.
@@ -5391,16 +5437,344 @@
     }
 
     function nodeSize(n, e = [...$('nodes').children].find(x => x.dataset.node === n.id)) { return { w: e?.offsetWidth || (board.mode === 'erd' ? 260 : mindCardLayout(n).w), h: e?.offsetHeight || (board.mode === 'erd' ? 84 + n.fields.length * 31 : mindCardLayout(n).h) } }
-    function edgeGeometry(e) { const a = board.nodes.find(n => n.id === e.from), b = board.nodes.find(n => n.id === e.to); if (!a || !b) return null; const as = nodeSize(a), bs = nodeSize(b); let ay = as.h / 2, by = bs.h / 2; if (board.mode === 'erd') { const ai = a.fields.findIndex(f => f.id === e.fromField), bi = b.fields.findIndex(f => f.id === e.toField); ay = 53 + ai * 31 + 15.5; by = 53 + bi * 31 + 15.5 } let x1, y1 = a.y + ay, x2, y2 = b.y + by; const right = b.x + bs.w / 2 > a.x + as.w / 2; x1 = a.x + (right ? as.w : 0); x2 = b.x + (right ? 0 : bs.w); let c = Math.max(65, Math.abs(x2 - x1) * .45); if (e.from === e.to) { x1 = a.x + as.w; x2 = x1; y2 = b.y + by; c = 95 } const c1 = x1 + (right ? c : -c), c2 = x2 + (e.from === e.to ? c : right ? -c : c); return { x1, y1, x2, y2, right, path: `M${x1},${y1} C${c1},${y1} ${c2},${y2} ${x2},${y2}`, mx: (x1 + x2) / 2 + (e.from === e.to ? 70 : 0), my: (y1 + y2) / 2 - 10 } }
+    function reflowERDBoard(diagram, beforeMove) {
+      const elements = new Map(Array.from($('nodes').children, el => [el.dataset.node, el]));
+      const tables = diagram.nodes.map(node =>
+        ({ node, x: node.x, y: node.y, ...nodeSize(node, elements.get(node.id) ?? null) }))
+        .sort((a, b) => a.y - b.y || a.x - b.x);
+      const occupied = [], overlapping = [];
+      const sharesColumns = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w;
+
+      // Reserve the existing layout before looking for new space.
+      for (const table of tables) {
+        const blocked = occupied.some(other => sharesColumns(table, other) &&
+          table.y < other.y + other.h && other.y < table.y + table.h);
+        (blocked ? overlapping : occupied).push(table);
+      }
+      const moves = [];
+      for (const table of overlapping) {
+        const blockers = occupied.filter(other => sharesColumns(table, other)).sort((a, b) => a.y - b.y);
+        const gap = 48;
+        let y = table.y;
+        for (const other of blockers) {
+          if (y + table.h + gap <= other.y) break;
+          y = Math.max(y, other.y + other.h + gap);
+        }
+        if (y > 100000) {
+          y = table.y;
+          for (const other of blockers.reverse()) {
+            if (y >= other.y + other.h + gap) break;
+            y = Math.min(y, other.y - table.h - gap);
+          }
+        }
+        if (Math.abs(y) > 100000) continue;
+        occupied.push({ ...table, y });
+        moves.push({ node: table.node, y });
+      }
+      if (!moves.length) return false;
+      beforeMove?.();
+      for (const { node, y } of moves) node.y = y;
+      return true;
+    }
+    function edgeGeometry(e) {
+      const a = board.nodes.find(n => n.id === e.from), b = board.nodes.find(n => n.id === e.to);
+      if (!a || !b) return null;
+      const as = nodeSize(a), bs = nodeSize(b);
+      const right = b.x + bs.w / 2 > a.x + as.w / 2, side = right ? 1 : -1;
+      const self = a === b, x1 = a.x + (right || self ? as.w : 0), x2 = b.x + (!right || self ? bs.w : 0);
+      const y1 = a.y + as.h / 2, y2 = b.y + bs.h / 2;
+      const bend = self ? 95 : Math.max(65, Math.abs(x2 - x1) * .45);
+      const c1 = x1 + side * bend, c2 = x2 + (self ? 1 : -side) * bend;
+      return { path: `M${x1},${y1} C${c1},${y1} ${c2},${y2} ${x2},${y2}`,
+        mx: (x1 + x2) / 2 + (self ? 70 : 0), my: (y1 + y2) / 2 - 10 };
+    }
+
+    const ERD_MARKER_LENGTH = 26;
+
+    const ERD_FORK_JUNCTION = 13;
+    function erdEndpointStemInset(type) {
+      if (type === 'many' || type === 'optionalMany') return ERD_FORK_JUNCTION;
+      return type === 'arrow' || type === 'reverseArrow' ? 7 : 0;
+    }
+
+    function isERDLabelPosition(value) {
+      return Number.isFinite(value) && value >= 0 && value <= 1;
+    }
+
+    function erdCurve(curves) {
+      const start = curves[0][0];
+      let middle = `H${start.x}`;
+      const points = [[start.x, start.y]];
+      for (const [a, b, c, d] of curves) {
+        middle += cubicConnectionGeometry(a, b, c, d).segment;
+        for (let step = 1; step <= 8; step++) {
+          const t = step / 8, u = 1 - t;
+          const coordinate = key => u ** 3 * a[key] + 3 * u * u * t * b[key] + 3 * u * t * t * c[key] + t ** 3 * d[key];
+          points.push([coordinate('x'), coordinate('y')]);
+        }
+      }
+      return { drawPath: (x1, x2) => `M${x1},${start.y} ${middle} H${x2}`, points };
+    }
+
+    function erdFacingCurve(x1, y1, x2, y2, laneOffset) {
+      const direction = Math.sign(x2 - x1);
+      const start = { x: x1 + direction * ERD_MARKER_LENGTH, y: y1 };
+      const end = { x: x2 - direction * ERD_MARKER_LENGTH, y: y2 };
+      const span = end.x - start.x;
+      let curves;
+      if (Math.abs(y2 - y1) < 14) {
+        const arch = Math.min(32, Math.abs(span) * .22);
+        const mid = { x: (start.x + end.x) / 2, y: (y1 + y2) / 2 + (laneOffset < 0 ? arch : -arch) };
+        curves = [
+          [start, { x: start.x + span * .22, y: y1 }, { x: mid.x - span * .17, y: mid.y }, mid],
+          [mid, { x: mid.x + span * .17, y: mid.y }, { x: end.x - span * .22, y: y2 }, end]
+        ];
+      } else {
+        const shift = direction * Math.max(-Math.abs(span) * .12, Math.min(Math.abs(span) * .12, laneOffset));
+        curves = [[start, { x: start.x + span * .45 + shift, y: y1 },
+          { x: end.x - span * .45 + shift, y: y2 }, end]];
+      }
+      return erdCurve(curves);
+    }
+
+    function roundedERDPath(points, cards, intersects) {
+      const last = points.length - 1;
+      let middle = '';
+      const samples = [points[0]];
+      for (let i = 1; i < last; i++) {
+        const [x, y] = points[i], [px, py] = points[i - 1], [nx, ny] = points[i + 1];
+        const inX = Math.sign(px - x), inY = Math.sign(py - y);
+        const outX = Math.sign(nx - x), outY = Math.sign(ny - y);
+        if (inX * outX + inY * outY) continue;
+        const approach = Math.abs(px - x) + Math.abs(py - y), departure = Math.abs(nx - x) + Math.abs(ny - y);
+        let radius = Math.min(36, approach / 2, departure / 2,
+          i === 1 ? approach - ERD_MARKER_LENGTH : Infinity,
+          i === last - 1 ? departure - ERD_MARKER_LENGTH : Infinity);
+        while (radius > 1) {
+          const corner = { x: x + Math.min(inX, outX, 0) * radius, right: x + Math.max(inX, outX, 0) * radius,
+            y: y + Math.min(inY, outY, 0) * radius, bottom: y + Math.max(inY, outY, 0) * radius };
+          if (!cards.some(card => intersects(corner, card))) break;
+          radius /= 2;
+        }
+        const start = [x + inX * radius, y + inY * radius], end = [x + outX * radius, y + outY * radius];
+        middle += ` L${start.join(',')} Q${x},${y} ${end.join(',')}`;
+        samples.push(start);
+        for (const t of [.25, .5, .75, 1]) {
+          const u = 1 - t;
+          samples.push([u * u * start[0] + 2 * u * t * x + t * t * end[0],
+            u * u * start[1] + 2 * u * t * y + t * t * end[1]]);
+        }
+      }
+      samples.push(points[last]);
+      return { drawPath: (x1, x2) => `M${x1},${points[0][1]}${middle} L${x2},${points[last][1]}`, samples };
+    }
+
+    function erdLabelTrack(points, width) {
+      let total = 0;
+      const lengths = points.map(([x, y], i) => {
+        if (i) total += Math.hypot(x - points[i - 1][0], y - points[i - 1][1]);
+        return total;
+      });
+      const inset = Math.min(ERD_MARKER_LENGTH + width / 2 + 4, total * .36);
+      return { points, lengths, start: inset, span: total - inset * 2 };
+    }
+
+    function erdLabelPoint(track, position) {
+      const distance = track.start + track.span * position;
+      const i = track.lengths.findIndex((length, index) => index > 0 && length >= distance);
+      if (i < 1) return track.points.at(-1);
+      const [ax, ay] = track.points[i - 1], [bx, by] = track.points[i];
+      const length = track.lengths[i] - track.lengths[i - 1];
+      const t = length ? (distance - track.lengths[i - 1]) / length : 0;
+      return [ax + (bx - ax) * t, ay + (by - ay) * t];
+    }
+
+    function nearestERDLabelPosition(track, x, y, preferred = .5) {
+      if (!track.span) return preferred;
+      let best = Infinity, position = preferred;
+      for (let i = 1; i < track.points.length; i++) {
+        const start = track.lengths[i - 1], length = track.lengths[i] - start;
+        if (!length || start + length < track.start || start > track.start + track.span) continue;
+        const [ax, ay] = track.points[i - 1], [bx, by] = track.points[i];
+        const dx = bx - ax, dy = by - ay;
+        const projected = ((x - ax) * dx + (y - ay) * dy) / (length * length);
+        const min = Math.max(0, (track.start - start) / length);
+        const max = Math.min(1, (track.start + track.span - start) / length);
+        const t = Math.max(min, Math.min(max, projected));
+        const distance = (x - ax - t * dx) ** 2 + (y - ay - t * dy) ** 2;
+        const progress = Math.max(0, Math.min(1, (start + t * length - track.start) / track.span));
+        if (distance < best || (distance === best && Math.abs(progress - preferred) < Math.abs(position - preferred))) {
+          position = progress;
+          best = distance;
+        }
+      }
+      return position;
+    }
+
+    function erdConnectionGeometry() {
+      const elements = new Map(Array.from($('nodes').children, el => [el.dataset.node, el]));
+      const cards = new Map(board.nodes.map(node => {
+        const el = elements.get(node.id), { w, h } = nodeSize(node, el ?? null);
+        const rows = new Map(Array.from(el?.querySelectorAll('[data-field]') || [], row =>
+          [row.dataset.field, el.clientTop + row.offsetTop + row.offsetHeight / 2]));
+        const fields = new Map(node.fields.map((f, i) => [f.id, { name: f.name, y: rows.get(f.id) ?? 68.5 + i * 31 }]));
+        return [node.id, { x: node.x, y: node.y, right: node.x + w, bottom: node.y + h, label: node.label, fields }];
+      }));
+      const bounds = [...cards.values()], pairs = new Map(), ports = new Map(), labels = [];
+      const intersects = (a, b) => a.x < b.right && a.right > b.x && a.y < b.bottom && a.bottom > b.y;
+      const routes = new Map();
+      function port(card, field, peerY) {
+        if (!ports.has(field)) ports.set(field, []);
+        const point = { y: card.y + field.y, peerY };
+        ports.get(field).push(point);
+        return point;
+      }
+      for (const edge of board.edges) {
+        const from = cards.get(edge.from), to = cards.get(edge.to);
+        const a = from?.fields.get(edge.fromField), b = to?.fields.get(edge.toField);
+        if (!a || !b) continue;
+        const pair = JSON.stringify([edge.from, edge.to].sort());
+        if (!pairs.has(pair)) pairs.set(pair, []);
+        pairs.get(pair).push({ edge, from, to, a: port(from, a, to.y + b.y), b: port(to, b, from.y + a.y) });
+      }
+      for (const points of ports.values()) {
+        if (points.length < 2) continue;
+        const spacing = Math.min(10, 18 / (points.length - 1));
+        points.sort((a, b) => a.peerY - b.peerY);
+        points.forEach((point, i) => { point.y += (i - (points.length - 1) / 2) * spacing });
+      }
+
+      for (const group of pairs.values()) {
+        group.forEach(({ edge, from, to, a, b }, index) => {
+          const fromField = from.fields.get(edge.fromField), toField = to.fields.get(edge.toField);
+          const self = from === to;
+          const lane = 12 * index, spread = 12 * (index - (group.length - 1) / 2);
+          const y1 = a.y, y2 = b.y;
+          const right = from.x + from.right <= to.x + to.right, side = right ? 1 : -1;
+          const candidates = [];
+
+          function add(s1, s2, middle, curve = null) {
+            const x1 = s1 === 1 ? from.right : from.x, x2 = s2 === 1 ? to.right : to.x;
+            const points = [[x1, y1], ...middle, [x2, y2]].filter(([x, y], i, all) =>
+              !i || x !== all[i - 1][0] || y !== all[i - 1][1]);
+            let score = curve ? 0 : points.length * 8 + 30;
+            for (let i = 1; i < points.length; i++) {
+              const [ax, ay] = points[i - 1], [bx, by] = points[i];
+              const segment = { x: Math.min(ax, bx) - 2, right: Math.max(ax, bx) + 2,
+                y: Math.min(ay, by) - 2, bottom: Math.max(ay, by) + 2 };
+              score += curve ? Math.hypot(ax - bx, ay - by) : Math.abs(ax - bx) + Math.abs(ay - by);
+              for (const card of bounds) {
+                if ((i === 1 && card === from) || (i === points.length - 1 && card === to)) continue;
+                if (intersects(segment, card)) {
+                  score += 1000000;
+                  break;
+                }
+              }
+            }
+            candidates.push({ points, score, x1, x2, y1, y2, s1, s2, curve });
+          }
+
+          const facingFrom = right ? from.right : from.x, facingTo = right ? to.x : to.right;
+          const gap = (facingTo - facingFrom) * side;
+          if (!self && gap >= 2 * ERD_MARKER_LENGTH + 2) {
+            const curve = erdFacingCurve(facingFrom, y1, facingTo, y2, spread);
+            add(side, -side, curve.points, curve.drawPath);
+          }
+          for (const s of [1, -1]) {
+            const x = s === 1 ? Math.max(from.right, to.right) + 42 + lane : Math.min(from.x, to.x) - 42 - lane;
+            if (Math.abs(y1 - y2) >= 20) {
+              const x1 = s === 1 ? from.right : from.x, x2 = s === 1 ? to.right : to.x;
+              const bend = Math.min(66, Math.abs(y1 - y2) * .25) * s;
+              const curve = erdCurve([[{ x: x1 + ERD_MARKER_LENGTH * s, y: y1 },
+                { x: x + bend, y: y1 }, { x: x + bend, y: y2 }, { x: x2 + ERD_MARKER_LENGTH * s, y: y2 }]]);
+              add(s, s, curve.points, curve.drawPath);
+              add(s, s, [[x, y1], [x, y2]]);
+            } else if (self) {
+              const bend = y1 + (y2 >= y1 ? -26 : 26);
+              add(s, s, [[x, y1], [x, bend], [x + 22 * s, bend], [x + 22 * s, y2]]);
+            } else {
+              add(s, s, [[x, y1], [x, y2]]);
+            }
+          }
+          if (!self && gap < 2 * ERD_MARKER_LENGTH + 2) {
+            const left = Math.min(from.x, to.x) - 54 - lane, right = Math.max(from.right, to.right) + 54 + lane;
+            const a = side > 0 ? left : right, b = side > 0 ? right : left;
+            for (const y of [Math.min(from.y, to.y) - 36 - lane, Math.max(from.bottom, to.bottom) + 36 + lane]) {
+              add(-side, side, [[a, y1], [a, y], [b, y], [b, y2]]);
+            }
+          }
+          if (!self && gap >= 2 * ERD_MARKER_LENGTH + 2) {
+            const left = Math.min(facingFrom, facingTo), right = Math.max(facingFrom, facingTo);
+            let top = Math.min(from.y, to.y), bottom = Math.max(from.bottom, to.bottom);
+            for (const card of bounds) {
+              if (card.right <= left || card.x >= right) continue;
+              if (card.bottom < Math.min(y1, y2) || card.y > Math.max(y1, y2)) continue;
+              top = Math.min(top, card.y);
+              bottom = Math.max(bottom, card.bottom);
+            }
+            const inset = Math.min(54, gap / 2 - 1);
+            for (const y of [top - 36 - lane, bottom + 36 + lane]) {
+              const a = facingFrom + inset * side, b = facingTo - inset * side;
+              add(side, -side, [[a, y1], [a, y], [b, y], [b, y2]]);
+              if (inset > ERD_MARKER_LENGTH + 1) {
+                const minInset = ERD_MARKER_LENGTH + 1;
+                add(side, -side, [[facingFrom + minInset * side, y1], [facingFrom + minInset * side, y],
+                  [facingTo - minInset * side, y], [facingTo - minInset * side, y2]]);
+              }
+            }
+          }
+          const ends = erdEnds(edge), caption = erdCardinalityCaption(edge, ends);
+          const description = edge.label?.trim().replace(/\s+/g, ' ') || '';
+          const shortLabel = description.length > 27 ? description.slice(0, 26) + '…' : description;
+          const width = Math.ceil(Math.max(mindTextWidth(caption, '600 11px Segoe UI'),
+            shortLabel ? mindTextWidth(shortLabel, '10px Segoe UI') : 0)) + 16;
+          const height = shortLabel ? 36 : 24;
+          let placement;
+          candidates.sort((a, b) => a.score - b.score);
+          for (const route of candidates) {
+            if (placement && route.score > placement.score) break;
+            const { drawPath, samples } = route.curve ? { drawPath: route.curve, samples: route.points } :
+              roundedERDPath(route.points, bounds, intersects);
+            const track = erdLabelTrack(samples, width);
+            for (const position of [.5, .36, .64, .22, .78, .08, .92, 0, 1]) {
+              const [mx, my] = erdLabelPoint(track, position);
+              const rect = { x: mx - width / 2, right: mx + width / 2, y: my - height / 2, bottom: my + height / 2 };
+              const overlapsTable = bounds.some(card => intersects(rect, card));
+              const overlapsLabel = labels.some(label => intersects(rect, label));
+              const score = route.score + overlapsTable * 10000 + (overlapsLabel ? 1000 : 0) +
+                Math.abs(position - .5) * 20;
+              if (!placement || score < placement.score) placement = { route, drawPath, track, position, score };
+            }
+          }
+          const { route, drawPath, track } = placement;
+          const path = drawPath(route.x1, route.x2);
+          const startInset = erdEndpointStemInset(ends[0]), endInset = erdEndpointStemInset(ends[1]);
+          // Keep the full route for selection while each inset marker draws its own tip or prongs.
+          const paintPath = startInset || endInset
+            ? drawPath(route.x1 + startInset * route.s1, route.x2 + endInset * route.s2) : path;
+          const position = isERDLabelPosition(edge.labelPosition) ? edge.labelPosition : placement.position;
+          const [mx, my] = erdLabelPoint(track, position);
+          const rect = { x: mx - width / 2, right: mx + width / 2, y: my - height / 2, bottom: my + height / 2 };
+          labels.push(rect);
+          const details = `${from.label}.${fromField.name} → ${to.label}.${toField.name}\n${caption}${edge.composite ? ' · Composite foreign key' : ''}${description ? '\n' + description : ''}`;
+          routes.set(edge.id, { ...route, path, paintPath, track, position, mx, my, width, height, caption, shortLabel,
+            ends, details, rect });
+        });
+      }
+      return edge => routes.get(edge.id);
+    }
     function cubicConnectionGeometry(start, first, second, end) {
+      const segment = ` C${first.x},${first.y} ${second.x},${second.y} ${end.x},${end.y}`;
       return {
-        path: `M${start.x},${start.y} C${first.x},${first.y} ${second.x},${second.y} ${end.x},${end.y}`,
+        segment,
+        path: `M${start.x},${start.y}${segment}`,
         mx: (start.x + 3 * first.x + 3 * second.x + end.x) / 8,
         my: (start.y + 3 * first.y + 3 * second.y + end.y) / 8 - 10
       };
     }
 
     function connectionGeometry() {
+      if (board.mode === 'erd') return erdConnectionGeometry();
       if (board.mode !== 'mind') return edgeGeometry;
       const elements = new Map(Array.from($('nodes').children, el => [el.dataset.node, el]));
       const cards = new Map(board.nodes.map(n => {
@@ -5455,12 +5829,291 @@
           { x: end.x - dx, y: end.y - dy }, end);
       };
     }
-    function endpoint(x, y, side, many) { if (many) return `<path d="M${x + side * 13} ${y - 6} L${x} ${y} L${x + side * 13} ${y + 6} M${x} ${y}H${x + side * 17}"/>`; return `<path d="M${x + side * 9} ${y - 6}V${y + 6} M${x} ${y}H${x + side * 17}"/>` }
-    function renderWires() { const geometry = connectionGeometry(); $('wires').classList.toggle('mind-wires', board.mode === 'mind'); $('wires').innerHTML = board.edges.map(e => { const g = geometry(e); if (!g) return ''; const n = board.nodes.find(n => n.id === e.to), active = selected?.type === 'edge' && selected.id === e.id, color = active ? '#398b69' : board.mode === 'mind' ? (n.color || colors[0]) : '#99ae8e'; const label = e.label || (board.mode === 'erd' ? e.cardinality : ''); const card = e.cardinality || '1:N'; return `<g data-edge="${esc(e.id)}"><path class="edge ${active ? 'selected' : ''}" d="${g.path}" stroke="${esc(color)}"${connectionStrokeAttributes(e, active ? 3 : 2)}/><path class="hit" d="${g.path}"/>${board.mode === 'erd' ? `<g fill="none" stroke="${esc(color)}" stroke-width="1.5">${endpoint(g.x1, g.y1, g.right ? 1 : -1, card === 'N:M')}${endpoint(g.x2, g.y2, g.right ? -1 : 1, card !== '1:1')}</g>` : ''}${label ? `<text class="edge-label" x="${g.mx}" y="${g.my}" text-anchor="middle">${esc(label)}</text>` : ''}</g>` }).join('') }
+    function erdEndpoint(x, y, side, type, surface, color = 'currentColor') {
+      const bar = '<path d="M7 -6.5V6.5"/>';
+      const foot = `<path d="M0 -7L${ERD_FORK_JUNCTION} 0L0 7M${ERD_FORK_JUNCTION} 0H0"/>`;
+      const oneBar = '<path d="M15 -6.5V6.5"/>', manyBar = '<path d="M19 -6.5V6.5"/>';
+      const zero = `<circle cx="20" r="4.25" fill="${surface}"/>`;
+      const marks = {
+        one: bar + oneBar, many: foot + manyBar, optionalOne: bar + zero, optionalMany: foot + zero,
+        arrow: `<path d="M0 0L12 -7V7Z" fill="${color}" stroke="none"/>`,
+        reverseArrow: `<path d="M12 0L0 -7V7Z" fill="${color}" stroke="none"/>`,
+        circle: `<circle cx="12" r="5" fill="${surface}"/>`,
+        diamond: `<path d="M5 0L12 -6L19 0L12 6Z" fill="${surface}"/>`, none: ''
+      };
+      const marker = marks[type];
+      return `<g transform="translate(${x},${y}) scale(${side},1)"><path d="M${erdEndpointStemInset(type)} 0H${ERD_MARKER_LENGTH}"/>${marker ? `<g stroke-width="2">${marker}</g>` : ''}</g>`;
+    }
+    function erdWireMarkup(edge, g, editor = false, active = false) {
+      const surface = editor ? 'var(--surface)' : '#fff', ink = editor ? 'var(--ink)' : '#202b27';
+      const stroke = editor ? 'currentColor' : '#67766f';
+      const width = active ? 3 : 2.5;
+      const ends = editor ? ' class="erd-endpoints"' : '';
+      const cap = connectionLineStyle(edge) === 'dotted' ? '' : ' stroke-linecap="round"';
+      const label = `<g class="erd-label"${editor ? ' data-erd-label' : ''} text-anchor="middle" dominant-baseline="central" font-family="Segoe UI, sans-serif" fill="${ink}">${editor ? `<title>${esc(g.details)}\nDrag to reposition</title>` : ''}<rect x="${g.rect.x}" y="${g.rect.y}" width="${g.width}" height="${g.height}" rx="7" fill="${surface}" stroke="${editor ? 'var(--line)' : '#dbe3d9'}"/><text x="${g.mx}" y="${g.my - (g.shortLabel ? 7 : 0)}" font-weight="600" font-size="11">${esc(g.caption)}</text>${g.shortLabel ? `<text x="${g.mx}" y="${g.my + 7}" font-size="10">${esc(g.shortLabel)}</text>` : ''}</g>`;
+      return `<g${editor ? ` class="erd-relationship${active ? ' active' : ''}" data-edge="${esc(edge.id)}" tabindex="0" role="button" aria-label="${esc(g.details.replace(/\n/g, '. '))}" aria-pressed="${active}" aria-description="Drag the label along the connector, or use the arrow keys. Home resets its position."` : ''}><title>${esc(g.details)}</title><path class="edge" fill="none" stroke-linejoin="round" stroke="${stroke}" stroke-width="${width}" d="${g.paintPath ?? g.path}"${cap}${connectionStrokeAttributes(edge, width)}/>${editor ? `<path class="hit" d="${g.path}"/>` : ''}<g${ends} fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round">${erdEndpoint(g.x1, g.y1, g.s1, g.ends[0], surface, stroke)}${erdEndpoint(g.x2, g.y2, g.s2, g.ends[1], surface, stroke)}</g>${label}</g>`;
+    }
+    function renderWires() {
+      const geometry = connectionGeometry(), wires = $('wires');
+      wires.classList.toggle('mind-wires', board.mode === 'mind');
+      wires.innerHTML = board.edges.map(e => {
+        const g = geometry(e);
+        if (!g) return '';
+        const active = selected?.type === 'edge' && selected.id === e.id;
+        if (board.mode === 'erd') return erdWireMarkup(e, g, true, active);
+        const n = board.nodes.find(n => n.id === e.to), color = active ? '#398b69' : n.color || colors[0];
+        return `<g data-edge="${esc(e.id)}"><path class="edge ${active ? 'selected' : ''}" d="${g.path}" stroke="${esc(color)}"${connectionStrokeAttributes(e, active ? 3 : 2)}/><path class="hit" d="${g.path}"/>${e.label ? `<text class="edge-label" x="${g.mx}" y="${g.my}" text-anchor="middle">${esc(e.label)}</text>` : ''}</g>`;
+      }).join('');
+    }
+    $('wires').addEventListener('keydown', event => {
+      const wire = event.target.closest('.erd-relationship');
+      if (!wire || event.ctrlKey || event.metaKey || event.altKey) return;
+      const step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
+      const reset = event.key === 'Home';
+      if (!step && !reset && !['Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const id = wire.dataset.edge;
+      if (step || reset) {
+        const edge = board.edges.find(edge => edge.id === id);
+        const g = edge && connectionGeometry()(edge);
+        if (g) {
+          const position = reset ? undefined : Math.max(0, Math.min(1, g.position + step * (event.shiftKey ? .15 : .05)));
+          saveERDLabelPosition(edge, position);
+        }
+      } else select('edge', id);
+      [...$('wires').children].find(el => el.dataset.edge === id)?.focus({ preventScroll: true });
+    });
+
+    function saveERDLabelPosition(edge, position) {
+      if (edge.labelPosition === position) return;
+      checkpoint();
+      if (position === undefined) delete edge.labelPosition;
+      else edge.labelPosition = position;
+      renderWires();
+      changed();
+    }
+
+    let erdLabelDrag = null;
+    canvas.addEventListener('pointerdown', event => {
+      const label = event.target.closest('[data-erd-label]');
+      if (!label || board.mode !== 'erd' || tool !== 'select' || space || event.button !== 0 || !event.isPrimary) return;
+      const edge = board.edges.find(edge => edge.id === label.closest('[data-edge]').dataset.edge);
+      const geometry = edge && connectionGeometry()(edge);
+      if (!geometry) return;
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      canvas.focus({ preventScroll: true });
+      select('edge', edge.id);
+      const pointer = toWorld(event.clientX, event.clientY);
+      erdLabelDrag = { edge, geometry, board, pointerId: event.pointerId, position: geometry.position,
+        clientX: event.clientX, clientY: event.clientY, dx: geometry.mx - pointer.x, dy: geometry.my - pointer.y, moved: false };
+      canvas.setPointerCapture(event.pointerId);
+    }, true);
+
+    canvas.addEventListener('pointermove', event => {
+      const session = erdLabelDrag;
+      if (!session || session.pointerId !== event.pointerId) return;
+      event.stopImmediatePropagation();
+      if (board !== session.board || !board.edges.includes(session.edge)) {
+        endERDLabelDrag();
+        return;
+      }
+      if (!session.moved && Math.hypot(event.clientX - session.clientX, event.clientY - session.clientY) < 4) return;
+      session.moved = true;
+      const { geometry } = session, pointer = toWorld(event.clientX, event.clientY);
+      session.position = nearestERDLabelPosition(geometry.track, pointer.x + session.dx, pointer.y + session.dy, session.position);
+      const [x, y] = erdLabelPoint(geometry.track, session.position);
+      const wire = [...$('wires').children].find(el => el.dataset.edge === session.edge.id);
+      wire?.classList.add('dragging');
+      wire?.querySelector('[data-erd-label]')?.setAttribute('transform', `translate(${x - geometry.mx},${y - geometry.my})`);
+      canvas.classList.add('dragging-erd-label');
+    }, true);
+
+    function endERDLabelDrag(event) {
+      const session = erdLabelDrag;
+      if (!session || (event && event.pointerId !== session.pointerId)) return;
+      erdLabelDrag = null;
+      event?.stopImmediatePropagation();
+      canvas.classList.remove('dragging-erd-label');
+      if (canvas.hasPointerCapture(session.pointerId)) canvas.releasePointerCapture(session.pointerId);
+      if (!session.moved) return;
+      if (event?.type === 'pointerup' && board === session.board && board.edges.includes(session.edge) &&
+          Math.abs(session.position - session.geometry.position) > .001) {
+        saveERDLabelPosition(session.edge, Math.round(session.position * 10000) / 10000);
+      } else {
+        renderWires();
+      }
+    }
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(type, endERDLabelDrag, true);
+    window.addEventListener('blur', () => endERDLabelDrag());
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !erdLabelDrag) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      endERDLabelDrag();
+    }, true);
+
+    function includeERDRoute(bounds, g) {
+      bounds.x = Math.min(bounds.x, g.rect.x);
+      bounds.y = Math.min(bounds.y, g.rect.y);
+      bounds.mx = Math.max(bounds.mx, g.rect.right);
+      bounds.my = Math.max(bounds.my, g.rect.bottom);
+      for (const [x, y] of g.points) {
+        bounds.x = Math.min(bounds.x, x);
+        bounds.y = Math.min(bounds.y, y);
+        bounds.mx = Math.max(bounds.mx, x);
+        bounds.my = Math.max(bounds.my, y);
+      }
+    }
+    function erdMarkerIcon(type, source) {
+      return `<svg class="erd-marker-icon" viewBox="0 -10 27 20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${erdEndpoint(source ? 0 : 27, 0, source ? 1 : -1, type, 'var(--surface)')}</svg>`;
+    }
+
+    function erdEndpointPicker(key, heading, current) {
+      const source = key === 'fromMarker';
+      return `<details class="erd-end-picker"><summary aria-label="${heading} marker, ${ERD_ENDPOINTS[current]}" title="${heading} marker">${erdMarkerIcon(current, source)}${heading}</summary>
+        <div class="erd-marker-menu" role="group" aria-label="${heading} markers">${Object.entries(ERD_ENDPOINTS).map(([type, label]) =>
+          `<button type="button" data-marker="${type}" data-marker-end="${key}" title="${label}" aria-label="${label}" aria-pressed="${type === current}">${erdMarkerIcon(type, source)}</button>`).join('')}</div></details>`;
+    }
+
+    function renderERDToolbar(edge) {
+      const panel = $('inspector'), [from, to] = erdEnds(edge);
+      panel.classList.remove('hidden');
+      panel.classList.add('erd-toolbar');
+      panel.innerHTML = `<div class="erd-toolbar-actions" role="group" aria-label="Relationship properties">
+        ${erdEndpointPicker('fromMarker', 'Source', from)}
+        ${erdEndpointPicker('toMarker', 'Target', to)}
+        <select id="erd-toolbar-style" aria-label="Line style" title="Line style">${Object.entries(LINE_STYLES).map(([key, label]) =>
+          `<option value="${key}"${key === connectionLineStyle(edge) ? ' selected' : ''}>${label}</option>`).join('')}</select>
+        <button id="erd-edge-details" title="Relationship details" aria-label="Relationship details">${ico('edit')}</button>
+        <button id="erd-edge-close" title="Close properties" aria-label="Close properties">${ico('close')}</button>
+      </div>`;
+      const pickers = [...panel.querySelectorAll('.erd-end-picker')];
+      for (const picker of pickers) picker.addEventListener('toggle', () => {
+        if (!picker.open) return;
+        pickers.filter(other => other !== picker).forEach(other => { other.open = false });
+        const menu = picker.querySelector('.erd-marker-menu'), bounds = canvas.getBoundingClientRect();
+        menu.style.translate = '';
+        menu.style.bottom = '';
+        menu.style.top = '';
+        const rect = menu.getBoundingClientRect();
+        const dx = Math.max(bounds.left + 8 - rect.left, Math.min(0, bounds.right - 8 - rect.right));
+        menu.style.translate = dx + 'px 0';
+        if (rect.bottom > bounds.bottom - 8) { menu.style.top = 'auto'; menu.style.bottom = 'calc(100% + 8px)' }
+      });
+      panel.querySelectorAll('[data-marker]').forEach(button => {
+        button.onclick = () => {
+          const { marker, markerEnd } = button.dataset;
+          const i = markerEnd === 'fromMarker' ? 0 : 1;
+          if (erdEnds(edge)[i] !== marker) {
+            checkpoint();
+            edge[markerEnd] = marker;
+            renderWires();
+            changed();
+          }
+          renderInspector();
+          panel.querySelectorAll('summary')[i]?.focus({ preventScroll: true });
+        };
+      });
+      $('erd-edge-close').onclick = () => select(null, null);
+      $('erd-toolbar-style').onchange = event => {
+        if (event.target.value === connectionLineStyle(edge)) return;
+        checkpoint();
+        edge.lineStyle = event.target.value;
+        renderWires();
+        changed();
+      };
+      $('erd-edge-details').onclick = () => {
+        relationshipDetailsId = edge.id;
+        renderInspector();
+        $('edge-label')?.focus({ preventScroll: true });
+      };
+    }
+
+    let relationshipDetailsId = null;
+    function inspectorPosition(bounds, item, width, height, preferAbove) {
+      const gap = 12;
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      const left = clamp(item.left, bounds.left, bounds.right);
+      const right = clamp(item.right, bounds.left, bounds.right);
+      const top = clamp(item.top, bounds.top, bounds.bottom);
+      const bottom = clamp(item.bottom, bounds.top, bounds.bottom);
+      const centerX = (left + right - width) / 2;
+      const beside = [{ x: right + gap, y: top }, { x: left - width - gap, y: top }];
+      const stacked = [{ x: centerX, y: top - height - gap }, { x: centerX, y: bottom + gap }];
+      const candidates = preferAbove ? [...stacked, ...beside] : [...beside, ...stacked.reverse()];
+      let best, bestOverlap = Infinity;
+      for (const point of candidates) {
+        const x = clamp(point.x, bounds.left, bounds.right - width);
+        const y = clamp(point.y, bounds.top, bounds.bottom - height);
+        const overlap = Math.max(0, Math.min(x + width, right + gap) - Math.max(x, left - gap)) *
+          Math.max(0, Math.min(y + height, bottom + gap) - Math.max(y, top - gap));
+        if (overlap < bestOverlap) { best = { x, y }; bestOverlap = overlap }
+        if (!overlap) break;
+      }
+      return best;
+    }
+
+    let inspectorPositionFrame = null;
+    function scheduleInspectorPosition() {
+      if (inspectorPositionFrame !== null) return;
+      inspectorPositionFrame = requestAnimationFrame(() => {
+        inspectorPositionFrame = null;
+        positionSelectionInspector();
+      });
+    }
+
+    function selectedInspectorAnchor() {
+      const { type, id } = selected;
+      if (type === 'node' || type === 'element') {
+        const layer = $(type === 'node' ? 'nodes' : 'elements');
+        const items = type === 'element' ? layer.querySelectorAll('.diagram-selected') : [];
+        const targets = items.length > 1 ? [...items] : [...layer.children].filter(el => el.dataset[type] === id);
+        const boxes = targets.map(el => el.getBoundingClientRect());
+        if (!boxes.length) return null;
+        return {
+          left: Math.min(...boxes.map(box => box.left)), right: Math.max(...boxes.map(box => box.right)),
+          top: Math.min(...boxes.map(box => box.top)), bottom: Math.max(...boxes.map(box => box.bottom))
+        };
+      }
+      const wire = [...$('wires').children].find(el => (type === 'edge' ? el.dataset.edge : el.dataset.elementLink) === id);
+      const label = wire?.querySelector('[data-erd-label], .edge-label, text');
+      if (label) return label.getBoundingClientRect();
+      const path = wire?.querySelector('.edge'), matrix = path?.getScreenCTM();
+      if (!matrix) return null;
+      const point = path.getPointAtLength(path.getTotalLength() / 2).matrixTransform(matrix);
+      return { left: point.x - 8, right: point.x + 8, top: point.y - 8, bottom: point.y + 8 };
+    }
+
+    function positionSelectionInspector() {
+      const panel = $('inspector');
+      if (!selected || !panel.getClientRects().length) return;
+      const item = selectedInspectorAnchor();
+      if (!item) return;
+      const area = canvas.getBoundingClientRect();
+      const bounds = { left: area.left + 12, right: area.right - 12, top: area.top + 12, bottom: area.bottom - 12 };
+      const rail = document.querySelector('.canvas-toolbar');
+      const toolbar = (rail.getClientRects().length ? rail : $('focus-rail')).getBoundingClientRect();
+      if (toolbar.height && toolbar.width > toolbar.height) bounds.top = Math.max(bounds.top, toolbar.bottom + 8);
+      else if (toolbar.width) bounds.left = Math.max(bounds.left, toolbar.right + 8);
+      const actions = $('board-actions').getBoundingClientRect();
+      if (actions.height) bounds.top = Math.max(bounds.top, actions.bottom + 8);
+      const zoom = document.querySelector('.zoom-control').getBoundingClientRect();
+      if (zoom.height) bounds.bottom = Math.min(bounds.bottom, zoom.top - 8);
+      const maxWidth = Math.max(0, bounds.right - bounds.left), maxHeight = Math.max(0, bounds.bottom - bounds.top);
+      panel.style.setProperty('--inspector-width', maxWidth + 'px');
+      panel.style.setProperty('--inspector-height', maxHeight + 'px');
+      const { width, height } = panel.getBoundingClientRect();
+      const { x, y } = inspectorPosition(bounds, item, width, height, ['edge', 'element-link'].includes(selected.type));
+      panel.style.setProperty('--inspector-x', Math.round(x - area.left) + 'px');
+      panel.style.setProperty('--inspector-y', Math.round(y - area.top) + 'px');
+    }
+
     function applyView() { const v = board.view; world.style.transform = `translate(${v.x}px,${v.y}px) scale(${v.z})`; $('zoom-label').textContent = Math.round(v.z * 100) + '%' }
-    function render() { $('reflow-mind-button').hidden = board.mode !== 'mind'; $('reflow-mind-button').disabled = !board.nodes.length; $('documentation-button').hidden = !board.codeScan || board.mode !== 'mind'; renderList(); $('board-title').textContent = board.name; $('mode-name').textContent = boardModeLabel(board.mode); $('sql-button').hidden = board.mode !== 'erd'; $('add-button').innerHTML = ico('plus') + (board.mode === 'mind' ? 'Add idea' : 'Add table'); updateCounts(); renderNodes(); applyView(); renderWires(); renderInspector(); updateHistory() }
+    function render() { $('reflow-mind-button').hidden = board.mode === 'design'; $('reflow-mind-button').title = board.mode === 'erd' ? 'Space overlapping tables while keeping your layout' : 'Space mind-map cards to fit their full content'; $('reflow-mind-button').disabled = !board.nodes.length; $('documentation-button').hidden = !board.codeScan || board.mode !== 'mind'; renderList(); $('board-title').textContent = board.name; $('mode-name').textContent = boardModeLabel(board.mode); $('sql-button').hidden = board.mode !== 'erd'; $('create-table-sql-button').hidden = board.mode !== 'erd'; $('add-button').innerHTML = ico('plus') + (board.mode === 'mind' ? 'Add idea' : 'Add table'); updateCounts(); renderNodes(); applyView(); renderWires(); renderInspector(); updateHistory() }
     function select(type, id) { selected = id ? { type, id } : null; renderNodes(); renderWires(); renderInspector() }
-    function fit() { if (!board.nodes.length) { board.view = { x: 0, y: 0, z: 1 }; applyView(); return } let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity; for (const n of board.nodes) { const s = nodeSize(n); minX = Math.min(minX, n.x); minY = Math.min(minY, n.y); maxX = Math.max(maxX, n.x + s.w); maxY = Math.max(maxY, n.y + s.h) } const rect = canvas.getBoundingClientRect(), margin = window.innerWidth <= 750 ? 16 : rect.width < 650 ? 65 : 100; const z = Math.max(.15, Math.min(1.15, (rect.width - margin * 2) / (maxX - minX), (rect.height - 130) / (maxY - minY))); board.view = { x: rect.width / 2 - (minX + maxX) / 2 * z, y: (rect.height - 25) / 2 - (minY + maxY) / 2 * z, z }; applyView(); persist() }
+    function fit() { if (!board.nodes.length) { board.view = { x: 0, y: 0, z: 1 }; applyView(); return } let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity; for (const n of board.nodes) { const s = nodeSize(n); minX = Math.min(minX, n.x); minY = Math.min(minY, n.y); maxX = Math.max(maxX, n.x + s.w); maxY = Math.max(maxY, n.y + s.h) } if (board.mode === 'erd' && board.edges.length) { const bounds = { x: minX, y: minY, mx: maxX, my: maxY }, geometry = connectionGeometry(); for (const edge of board.edges) { const route = geometry(edge); if (route) includeERDRoute(bounds, route) } ({ x: minX, y: minY, mx: maxX, my: maxY } = bounds) } const rect = canvas.getBoundingClientRect(), margin = window.innerWidth <= 750 ? 16 : rect.width < 650 ? 65 : 100; const z = Math.max(.15, Math.min(1.15, (rect.width - margin * 2) / (maxX - minX), (rect.height - 130) / (maxY - minY))); board.view = { x: rect.width / 2 - (minX + maxX) / 2 * z, y: (rect.height - 25) / 2 - (minY + maxY) / 2 * z, z }; applyView(); persist() }
     function zoom(factor, x = canvas.clientWidth / 2, y = canvas.clientHeight / 2) { const v = board.view, z = Math.min(2, Math.max(.15, v.z * factor)); v.x = x - (x - v.x) * z / v.z; v.y = y - (y - v.y) * z / v.z; v.z = z; applyView(); clearTimeout(saveTimer); saveTimer = setTimeout(persist, 250) }
     function toWorld(x, y) { const r = canvas.getBoundingClientRect(), v = board.view; return { x: (x - r.left - v.x) / v.z, y: (y - r.top - v.y) / v.z } }
     function centerPoint() { return toWorld(canvas.getBoundingClientRect().left + canvas.clientWidth * .45, canvas.getBoundingClientRect().top + canvas.clientHeight * .45) }
@@ -5535,17 +6188,17 @@
     }
 
     function updateNode(id, prop, value) { const n = board.nodes.find(n => n.id === id); if (!n || n[prop] === value) return; checkpoint(); n[prop] = value; renderNodes(); renderWires(); changed() }
-    function renderInspector() { const panel = $('inspector'); if (!selected) { panel.classList.add('hidden'); return } panel.classList.remove('hidden'); const n = selected.type === 'node' ? board.nodes.find(n => n.id === selected.id) : null, e = selected.type === 'edge' ? board.edges.find(e => e.id === selected.id) : null; if (!n && !e) { selected = null; panel.classList.add('hidden'); return } let body = ''; if (n) { body = board.mode === 'mind' ? notesField(n, 'label', 'prop-label', 'Idea') : `<div class="form-group"><label for="prop-label">TABLE NAME</label><input id="prop-label" maxlength="150" value="${esc(n.label)}"></div>`; if (board.mode === 'mind') body += `${notesField(n, 'note', 'prop-note', 'Notes')}${branchColorField(n)}<button class="primary wide" id="child-button">${ico('plus')}Add connected idea</button><button class="wide" id="connect-button">${ico('link')}Connect to another idea</button>${mindOrderControls(n)}`; else body += `<div class="form-label">COLUMNS <span class="small-count">${n.fields.length}</span></div><div class="field-warning">PK = primary key · FK comes from a relationship.</div><div id="fields-editor">${n.fields.map(f => `<div class="field-editor" data-fid="${esc(f.id)}"><div class="row"><input class="f-name" value="${esc(f.name)}" aria-label="Column name" maxlength="150"><input class="f-type" value="${esc(f.type)}" aria-label="Column SQL type" maxlength="500"></div><div class="field-flags"><label><input class="f-pk" type="checkbox" ${f.pk ? 'checked' : ''}>PK</label><label><input class="f-null" type="checkbox" ${f.nullable ? 'checked' : ''} ${f.pk ? 'disabled' : ''}>Nullable</label><button class="f-delete danger" aria-label="Delete column" title="Delete column">${ico('close')}</button></div></div>`).join('')}</div><button class="wide" id="add-field">${ico('plus')}Add column</button><hr><button class="wide" id="connect-button">${ico('link')}Create relationship</button><div class="muted">Relationships connect a source column to a target column.</div>`; body += `<hr><div class="row"><button id="duplicate-node">${ico('copy')}Duplicate</button><button class="danger" id="delete-selection">${ico('trash')}Delete</button></div>` } else { const a = board.nodes.find(n => n.id === e.from), b = board.nodes.find(n => n.id === e.to); body = `<div class="help-note" style="margin-bottom:15px">${esc(a.label)} → ${esc(b.label)}</div>`; if (board.mode === 'erd') body += `<div class="form-group"><label for="edge-from">SOURCE COLUMN (${esc(a.label)})</label><select id="edge-from">${a.fields.map(f => `<option value="${esc(f.id)}" ${e.fromField === f.id ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select></div><div class="form-group"><label for="edge-to">TARGET COLUMN (${esc(b.label)})</label><select id="edge-to">${b.fields.map(f => `<option value="${esc(f.id)}" ${e.toField === f.id ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select></div><div class="form-group"><label for="edge-card">CARDINALITY (SOURCE : TARGET)</label><select id="edge-card"><option ${e.cardinality === '1:N' ? 'selected' : ''}>1:N</option><option ${e.cardinality === '1:1' ? 'selected' : ''}>1:1</option><option ${e.cardinality === 'N:M' ? 'selected' : ''}>N:M</option></select></div><div class="muted" style="margin-bottom:15px">Use a junction table for a physical many-to-many schema. Cardinality here is a diagram annotation.</div>`; body += `<div class="form-group"><label for="edge-label">Connection label</label><input id="edge-label" maxlength="150" value="${esc(e.label || '')}" placeholder="${board.mode === 'mind' ? 'How are these connected?' : 'Optional description'}"></div>${lineStyleField('edge-line-style', e)}<button class="wide danger" id="delete-selection">${ico('trash')}Delete connection</button>` } panel.innerHTML = `<div class="inspector-header">${n ? (board.mode === 'mind' ? 'Idea properties' : 'Table properties') : 'Connection'}<button id="close-inspector" aria-label="Close properties">${ico('close')}</button></div><div class="inspector-body">${body}</div>`; $('close-inspector').onclick = () => select(null, null); $('delete-selection').onclick = deleteSelected; if (n) { if (board.mode === 'erd') $('prop-label').onchange = ev => { const v = ev.target.value.trim(); if (!v) { ev.target.value = n.label; toast('Please enter a name.'); return } if (board.mode === 'erd' && board.nodes.some(x => x.id !== n.id && x.label === v)) { ev.target.value = n.label; toast('A table with this name already exists.'); return } updateNode(n.id, 'label', v) }; if (board.mode === 'mind') { bindNotesField(n, 'label', 'prop-label', 'Idea', IDEA_TITLE_LIMIT); bindNotesField(n, 'note', 'prop-note', 'Notes', NOTE_LIMIT); bindBranchColor(n); $('child-button').onclick = () => addNode(null, n.id); if ($('idea-move-up')) { $('idea-move-up').onclick = () => moveMindIdea(n.id, -1); $('idea-move-down').onclick = () => moveMindIdea(n.id, 1) } } else { $('add-field').onclick = () => { checkpoint(); let name = 'column', i = 2; while (n.fields.some(f => f.name === name)) name = 'column_' + i++; n.fields.push(field(name, 'VARCHAR(255)', false, true)); render(); changed() }; panel.querySelectorAll('.field-editor').forEach(el => { const f = n.fields.find(f => f.id === el.dataset.fid); for (const [css, key] of [['.f-name', 'name'], ['.f-type', 'type'], ['.f-pk', 'pk'], ['.f-null', 'nullable']]) el.querySelector(css).onchange = ev => { const v = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value.trim(); if ((typeof v === 'string' && !v) || (key === 'name' && n.fields.some(x => x.id !== f.id && x.name === v))) { ev.target.value = f[key]; toast('Column names must be nonempty and unique.'); return } checkpoint(); f[key] = v; if (key === 'pk' && v) f.nullable = false; render(); changed() }; el.querySelector('.f-delete').onclick = () => { if (n.fields.length === 1) { toast('Keep at least one column in the table.'); return } checkpoint(); n.fields = n.fields.filter(x => x.id !== f.id); board.edges = board.edges.filter(e => !(e.from === n.id && e.fromField === f.id) && !(e.to === n.id && e.toField === f.id)); render(); changed() } }) } $('connect-button').onclick = () => { setTool('link'); linkSource = n.id; renderNodes(); toast('Now select the target ' + (board.mode === 'mind' ? 'idea.' : 'table.')) }; $('duplicate-node').onclick = () => { checkpoint(); const c = clone(n); c.id = uid(); c.x += 50; c.y += 70; c.root = false; if (c.fields) { c.label = uniqueTableName(n.label + '_copy'); c.fields.forEach(f => f.id = uid()) } board.nodes.push(c); selected = { type: 'node', id: c.id }; render(); changed() } } else { for (const [id, key] of [['edge-from', 'fromField'], ['edge-to', 'toField'], ['edge-card', 'cardinality'], ['edge-label', 'label'], ['edge-line-style', 'lineStyle']]) { const el = $(id); if (el) el.onchange = ev => { checkpoint(); e[key] = ev.target.value; renderNodes(); renderWires(); changed() } } } }
+    function renderInspector() { const panel = $('inspector'); if (!selected) { panel.classList.add('hidden'); return } panel.classList.remove('hidden'); const n = selected.type === 'node' ? board.nodes.find(n => n.id === selected.id) : null, e = selected.type === 'edge' ? board.edges.find(e => e.id === selected.id) : null; if (!n && !e) { selected = null; panel.classList.add('hidden'); return } let body = ''; if (n) { body = board.mode === 'mind' ? notesField(n, 'label', 'prop-label', 'Idea') : `<div class="form-group"><label for="prop-label">TABLE NAME</label><input id="prop-label" maxlength="150" value="${esc(n.label)}"></div>`; if (board.mode === 'mind') body += `${notesField(n, 'note', 'prop-note', 'Notes')}${branchColorField(n)}<button class="primary wide" id="child-button">${ico('plus')}Add connected idea</button><button class="wide" id="connect-button">${ico('link')}Connect to another idea</button>${mindOrderControls(n)}`; else body += `<div class="form-label">COLUMNS <span class="small-count">${n.fields.length}</span></div><div class="field-warning">PK = primary key · FK comes from a relationship.</div><div id="fields-editor">${n.fields.map(f => `<div class="field-editor" data-fid="${esc(f.id)}"><div class="row"><input class="f-name" value="${esc(f.name)}" aria-label="Column name" maxlength="150"><input class="f-type" value="${esc(f.type)}" aria-label="Column SQL type" maxlength="500"></div><div class="field-flags"><label><input class="f-pk" type="checkbox" ${f.pk ? 'checked' : ''}>PK</label><label><input class="f-null" type="checkbox" ${f.nullable ? 'checked' : ''} ${f.pk ? 'disabled' : ''}>Nullable</label><button class="f-delete danger" aria-label="Delete column" title="Delete column">${ico('close')}</button></div></div>`).join('')}</div><button class="wide" id="add-field">${ico('plus')}Add column</button><hr><button class="wide" id="connect-button">${ico('link')}Create relationship</button><div class="muted">Relationships connect a source column to a target column.</div>`; body += `<hr><div class="row"><button id="duplicate-node">${ico('copy')}Duplicate</button><button class="danger" id="delete-selection">${ico('trash')}Delete</button></div>` } else { const a = board.nodes.find(n => n.id === e.from), b = board.nodes.find(n => n.id === e.to); body = `<div class="help-note" style="margin-bottom:15px">${esc(a.label)} → ${esc(b.label)}</div>`; if (board.mode === 'erd') body += `<div class="form-group"><label for="edge-from">SOURCE COLUMN (${esc(a.label)})</label><select id="edge-from">${a.fields.map(f => `<option value="${esc(f.id)}" ${e.fromField === f.id ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select></div><div class="form-group"><label for="edge-to">TARGET COLUMN (${esc(b.label)})</label><select id="edge-to">${b.fields.map(f => `<option value="${esc(f.id)}" ${e.toField === f.id ? 'selected' : ''}>${esc(f.name)}</option>`).join('')}</select></div><button class="wide" id="erd-back-to-markers">Edit endpoint markers</button>`; body += `<div class="form-group"><label for="edge-label">Connection label</label><input id="edge-label" maxlength="150" value="${esc(e.label || '')}" placeholder="${board.mode === 'mind' ? 'How are these connected?' : 'Optional description'}"></div>${lineStyleField('edge-line-style', e)}<button class="wide danger" id="delete-selection">${ico('trash')}Delete connection</button>` } panel.innerHTML = `<div class="inspector-header">${n ? (board.mode === 'mind' ? 'Idea properties' : 'Table properties') : 'Connection'}<button id="close-inspector" aria-label="Close properties">${ico('close')}</button></div><div class="inspector-body">${body}</div>`; $('close-inspector').onclick = () => select(null, null); $('delete-selection').onclick = deleteSelected; if ($('erd-back-to-markers')) $('erd-back-to-markers').onclick = () => { relationshipDetailsId = null; renderInspector() }; if (n) { if (board.mode === 'erd') $('prop-label').onchange = ev => { const v = ev.target.value.trim(); if (!v) { ev.target.value = n.label; toast('Please enter a name.'); return } if (board.mode === 'erd' && board.nodes.some(x => x.id !== n.id && x.label === v)) { ev.target.value = n.label; toast('A table with this name already exists.'); return } updateNode(n.id, 'label', v) }; if (board.mode === 'mind') { bindNotesField(n, 'label', 'prop-label', 'Idea', IDEA_TITLE_LIMIT); bindNotesField(n, 'note', 'prop-note', 'Notes', NOTE_LIMIT); bindBranchColor(n); $('child-button').onclick = () => addNode(null, n.id); if ($('idea-move-up')) { $('idea-move-up').onclick = () => moveMindIdea(n.id, -1); $('idea-move-down').onclick = () => moveMindIdea(n.id, 1) } } else { $('add-field').onclick = () => { checkpoint(); let name = 'column', i = 2; while (n.fields.some(f => f.name === name)) name = 'column_' + i++; n.fields.push(field(name, 'VARCHAR(255)', false, true)); render(); changed() }; panel.querySelectorAll('.field-editor').forEach(el => { const f = n.fields.find(f => f.id === el.dataset.fid); for (const [css, key] of [['.f-name', 'name'], ['.f-type', 'type'], ['.f-pk', 'pk'], ['.f-null', 'nullable']]) el.querySelector(css).onchange = ev => { const v = ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value.trim(); if ((typeof v === 'string' && !v) || (key === 'name' && n.fields.some(x => x.id !== f.id && x.name === v))) { ev.target.value = f[key]; toast('Column names must be nonempty and unique.'); return } checkpoint(); f[key] = v; if (key === 'pk' && v) f.nullable = false; render(); changed() }; el.querySelector('.f-delete').onclick = () => { if (n.fields.length === 1) { toast('Keep at least one column in the table.'); return } checkpoint(); n.fields = n.fields.filter(x => x.id !== f.id); board.edges = board.edges.filter(e => !(e.from === n.id && e.fromField === f.id) && !(e.to === n.id && e.toField === f.id)); render(); changed() } }) } $('connect-button').onclick = () => { setTool('link'); linkSource = n.id; renderNodes(); toast('Now select the target ' + (board.mode === 'mind' ? 'idea.' : 'table.')) }; $('duplicate-node').onclick = () => { checkpoint(); const c = clone(n); c.id = uid(); c.x += 50; c.y += 70; c.root = false; if (c.fields) { c.label = uniqueTableName(n.label + '_copy'); c.fields.forEach(f => f.id = uid()) } board.nodes.push(c); selected = { type: 'node', id: c.id }; render(); changed() } } else { for (const [id, key] of [['edge-from', 'fromField'], ['edge-to', 'toField'], ['edge-label', 'label'], ['edge-line-style', 'lineStyle']]) { const el = $(id); if (el) el.onchange = ev => { checkpoint(); e[key] = ev.target.value; renderNodes(); renderWires(); changed() } } } }
     function createLink(from, to) { if (board.mode === 'mind' && from === to) { toast('Choose another idea.'); return } if (board.mode === 'mind' && board.edges.some(e => e.from === from && e.to === to || e.from === to && e.to === from)) { toast('These ideas are already connected.'); return } if (board.mode === 'erd') { relationshipDialog(from, to); return } checkpoint(); const e = { id: uid(), from, to, label: '' }; board.edges.push(e); setTool('select'); selected = { type: 'edge', id: e.id }; render(); changed() }
     function openModal(title, html) { $('modal-title').textContent = title; $('modal-body').innerHTML = html; $('modal').showModal(); iconify($('modal')) } function closeModal() { $('modal').close() } $('modal-close').onclick = closeModal; $('modal').addEventListener('click', e => { if (e.target === $('modal')) { const r = $('modal').getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) closeModal() } });
-    function relationshipDialog(from, to) { const a = board.nodes.find(n => n.id === from), b = board.nodes.find(n => n.id === to); if (!a.fields.length || !b.fields.length) { toast('Both tables need at least one column.'); return } const primary = a.fields.find(f => f.pk) || a.fields[0]; const guess = b.fields.find(f => f.name === a.label.replace(/s$/, '') + '_id') || b.fields.find(f => !f.pk) || b.fields[0]; openModal('Connect your tables', `<p>Choose which columns connect. This adds a relationship to the diagram.</p><div class="form-group"><label for="rel-from">SOURCE · ${esc(a.label)}</label><select id="rel-from">${a.fields.map(f => `<option value="${esc(f.id)}" ${f.id === primary.id ? 'selected' : ''}>${esc(f.name)} · ${esc(f.type)}</option>`).join('')}</select></div><div class="form-group"><label for="rel-to">TARGET · ${esc(b.label)}</label><select id="rel-to">${b.fields.map(f => `<option value="${esc(f.id)}" ${f.id === guess.id ? 'selected' : ''}>${esc(f.name)} · ${esc(f.type)}</option>`).join('')}</select></div><div class="form-group"><label for="rel-card">CARDINALITY (SOURCE : TARGET)</label><select id="rel-card"><option>1:N</option><option>1:1</option><option>N:M</option></select></div><div class="dialog-actions"><button id="rel-cancel">Cancel</button><button class="primary" id="rel-save">Create relationship</button></div>`); $('rel-cancel').onclick = () => { closeModal(); setTool('select') }; $('rel-save').onclick = () => { const ff = $('rel-from').value, tf = $('rel-to').value; if (board.edges.some(e => e.from === from && e.to === to && e.fromField === ff && e.toField === tf)) { toast('This relationship already exists.'); return } checkpoint(); const e = { id: uid(), from, to, fromField: ff, toField: tf, cardinality: $('rel-card').value, label: '' }; board.edges.push(e); closeModal(); setTool('select'); selected = { type: 'edge', id: e.id }; render(); changed() } }
+    function relationshipDialog(from, to) { const a = board.nodes.find(n => n.id === from), b = board.nodes.find(n => n.id === to); if (!a.fields.length || !b.fields.length) { toast('Both tables need at least one column.'); return } const primary = a.fields.find(f => f.pk) || a.fields[0]; const guess = b.fields.find(f => f.name === a.label.replace(/s$/, '') + '_id') || b.fields.find(f => !f.pk) || b.fields[0]; openModal('Connect your tables', `<p>Choose which columns connect. This adds a relationship to the diagram.</p><div class="form-group"><label for="rel-from">SOURCE · ${esc(a.label)}</label><select id="rel-from">${a.fields.map(f => `<option value="${esc(f.id)}" ${f.id === primary.id ? 'selected' : ''}>${esc(f.name)} · ${esc(f.type)}</option>`).join('')}</select></div><div class="form-group"><label for="rel-to">TARGET · ${esc(b.label)}</label><select id="rel-to">${b.fields.map(f => `<option value="${esc(f.id)}" ${f.id === guess.id ? 'selected' : ''}>${esc(f.name)} · ${esc(f.type)}</option>`).join('')}</select></div><div class="row"><div class="form-group"><label for="rel-from-marker">Source marker</label><select id="rel-from-marker">${erdEndpointOptions('one')}</select></div><div class="form-group"><label for="rel-to-marker">Target marker</label><select id="rel-to-marker">${erdEndpointOptions('many')}</select></div></div><div class="dialog-actions"><button id="rel-cancel">Cancel</button><button class="primary" id="rel-save">Create relationship</button></div>`); $('rel-cancel').onclick = () => { closeModal(); setTool('select') }; $('rel-save').onclick = () => { const ff = $('rel-from').value, tf = $('rel-to').value; if (board.edges.some(e => e.from === from && e.to === to && e.fromField === ff && e.toField === tf)) { toast('This relationship already exists.'); return } checkpoint(); const e = { id: uid(), from, to, fromField: ff, toField: tf, cardinality: '1:N', fromMarker: $('rel-from-marker').value, toMarker: $('rel-to-marker').value, label: '' }; board.edges.push(e); closeModal(); setTool('select'); selected = { type: 'edge', id: e.id }; render(); changed() } }
     function newBoardDialog() { let mode = 'mind'; openModal('New board', `<div class="form-group"><label for="new-name">BOARD NAME</label><input id="new-name" maxlength="150" placeholder="Untitled board" autofocus></div><div class="form-label">BOARD TYPE</div><div class="type-choices"><button class="type-choice active" id="type-mind">${ico('map')}<strong>Mind map</strong><small>Ideas and connections</small></button><button class="type-choice" id="type-erd">${ico('table')}<strong>Database diagram</strong><small>Tables, columns, and relationships</small></button><button class="type-choice" id="type-design">${ico('image')}<strong>Design page</strong><small>Text, shapes, and layouts</small></button></div><div class="dialog-actions"><button id="new-cancel">Cancel</button><button class="primary" id="new-create">Create board ${ico('arrow')}</button></div>`); for (const m of ['mind', 'erd', 'design']) $('type-' + m).onclick = () => { mode = m; for (const x of ['mind', 'erd', 'design']) $('type-' + x).classList.toggle('active', x === m) }; $('new-cancel').onclick = closeModal; const create = () => { const name = $('new-name').value.trim() || (mode === 'mind' ? 'Untitled mind map' : mode === 'design' ? 'Untitled design' : 'Untitled database'); const b = { id: uid(), name, mode, nodes: [], edges: [], view: { x: 0, y: 0, z: 1 }, updated: Date.now() }; if (mode === 'design') { b.page = normalizeCanvasPage({ preset: 'presentation' }, mode); b.elements = [] } workspace.boards.push(b); closeModal(); setBoard(b.id); addNode(); fit() }; $('new-create').onclick = create; $('new-name').onkeydown = e => { if (e.key === 'Enter') create() }; setTimeout(() => $('new-name').focus(), 50) }
     function renameDialog() { openModal('Board settings', `<div class="form-group"><label for="board-name-input">BOARD NAME</label><input id="board-name-input" value="${esc(board.name)}" maxlength="150"></div><div class="help-note">${boardModeLabel(board.mode)} · ${boardNodeCount(board)} ${board.mode === 'mind' ? 'ideas' : board.mode === 'design' ? 'objects' : 'tables'} · Saved locally in this browser</div><div class="dialog-actions" style="justify-content:space-between"><button class="danger" id="delete-board">${ico('trash')}Delete board</button><button class="primary" id="save-board-name">Save name</button></div>`); $('save-board-name').onclick = () => { const name = $('board-name-input').value.trim(); if (!name) return; checkpoint(); board.name = name; closeModal(); render(); changed() }; $('delete-board').onclick = () => { openModal('Delete this board?', `<p>“${esc(board.name)}” and its contents will be removed from this browser. Export a JSON backup first if you want to keep a copy.</p><div class="dialog-actions"><button id="keep-board">Keep board</button><button class="primary" id="confirm-delete-board" style="background:#a45e52;border-color:#a45e52">Delete board</button></div>`); $('keep-board').onclick = closeModal; $('confirm-delete-board').onclick = () => { workspace.boards = workspace.boards.filter(b => b.id !== board.id); if (!workspace.boards.length) workspace.boards.push({ id: uid(), name: 'My ideas', mode: 'mind', nodes: [], edges: [], view: { x: 0, y: 0, z: 1 }, updated: Date.now() }); closeModal(); setBoard(workspace.boards[0].id) } }; setTimeout(() => $('board-name-input').select(), 20) }
-    canvas.addEventListener('pointerdown', e => { if (e.target.closest('button,input,textarea,select,.inspector,.canvas-toolbar,.canvas-footer')) return; const node = e.target.closest('[data-node]'), edge = e.target.closest('[data-edge]'); if (e.button !== 0 && e.button !== 1) return; if (e.button === 0 && !space && tool === 'select' && e.target.closest('.idea-card-image')) return; canvas.focus({ preventScroll: true }); if (e.button === 1 || space || tool === 'pan') { drag = { kind: 'pan', x: e.clientX, y: e.clientY, v: clone(board.view) }; canvas.classList.add('panning'); canvas.setPointerCapture(e.pointerId); e.preventDefault(); return } if (node) { const id = node.dataset.node; if (tool === 'link') { if (!linkSource) { linkSource = id; renderNodes(); toast('Choose the target ' + (board.mode === 'mind' ? 'idea.' : 'table.')) } else createLink(linkSource, id); return } select('node', id); const n = board.nodes.find(n => n.id === id); drag = { kind: 'node', id, x: e.clientX, y: e.clientY, nx: n.x, ny: n.y, saved: false }; canvas.setPointerCapture(e.pointerId); e.preventDefault() } else if (edge) { select('edge', edge.dataset.edge) } else { if (tool === 'link') { linkSource = null; renderNodes() } else select(null, null); drag = { kind: 'pan', x: e.clientX, y: e.clientY, v: clone(board.view) }; canvas.setPointerCapture(e.pointerId) } });
+    canvas.addEventListener('pointerdown', e => { if (e.target.closest('button,input,textarea,select,.inspector,.canvas-toolbar,.canvas-footer,#board-actions')) return; const node = e.target.closest('[data-node]'), edge = e.target.closest('[data-edge]'); if (e.button !== 0 && e.button !== 1) return; if (e.button === 0 && !space && tool === 'select' && e.target.closest('.idea-card-image')) return; canvas.focus({ preventScroll: true }); if (e.button === 1 || space || tool === 'pan') { drag = { kind: 'pan', x: e.clientX, y: e.clientY, v: clone(board.view) }; canvas.classList.add('panning'); canvas.setPointerCapture(e.pointerId); e.preventDefault(); return } if (node) { const id = node.dataset.node; if (tool === 'link') { if (!linkSource) { linkSource = id; renderNodes(); toast('Choose the target ' + (board.mode === 'mind' ? 'idea.' : 'table.')) } else createLink(linkSource, id); return } select('node', id); const n = board.nodes.find(n => n.id === id); drag = { kind: 'node', id, x: e.clientX, y: e.clientY, nx: n.x, ny: n.y, saved: false }; canvas.setPointerCapture(e.pointerId); e.preventDefault() } else if (edge) { select('edge', edge.dataset.edge) } else { if (tool === 'link') { linkSource = null; renderNodes() } else select(null, null); drag = { kind: 'pan', x: e.clientX, y: e.clientY, v: clone(board.view) }; canvas.setPointerCapture(e.pointerId) } });
     canvas.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (drag.kind === 'pan') { board.view.x = drag.v.x + dx; board.view.y = drag.v.y + dy; applyView() } else { if (!drag.saved && Math.abs(dx) + Math.abs(dy) > 3) { checkpoint(); drag.saved = true } if (drag.saved) { const n = board.nodes.find(n => n.id === drag.id); n.x = drag.nx + dx / board.view.z; n.y = drag.ny + dy / board.view.z; const el = [...$('nodes').children].find(x => x.dataset.node === n.id); el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; renderWires() } } });
     function endDrag(e) { if (!drag) return; const moved = drag.kind === 'node' && drag.saved; drag = null; canvas.classList.remove('panning'); if (e && canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId); if (moved) { changed(); if (board.mode === 'mind') renderInspector() } else persist() } canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
-    canvas.addEventListener('dblclick', e => { if (e.target.closest('.inspector,.canvas-toolbar,.canvas-footer')) return; const image = e.target.closest('.idea-card-image'); if (image && tool === 'select') { openIdeaImage(image); return } const n = e.target.closest('[data-node]'); if (n) { select('node', n.dataset.node); focusIdeaLabel() } else if (!e.target.closest('[data-edge]')) { const p = toWorld(e.clientX, e.clientY); addNode(p) } });
-    canvas.addEventListener('wheel', e => { if (e.target.closest('.inspector,.canvas-toolbar')) return; e.preventDefault(); const r = canvas.getBoundingClientRect(); if (e.ctrlKey || e.metaKey) zoom(Math.exp(-e.deltaY * .008), e.clientX - r.left, e.clientY - r.top); else { board.view.x -= e.deltaX; board.view.y -= e.deltaY; applyView(); clearTimeout(saveTimer); saveTimer = setTimeout(persist, 250) } }, { passive: false });
+    canvas.addEventListener('dblclick', e => { if (e.target.closest('.inspector,.canvas-toolbar,.canvas-footer,#board-actions')) return; const image = e.target.closest('.idea-card-image'); if (image && tool === 'select') { openIdeaImage(image); return } const n = e.target.closest('[data-node]'); if (n) { select('node', n.dataset.node); focusIdeaLabel() } else if (!e.target.closest('[data-edge]') && (board.mode !== 'erd' || !document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-erd-label]'))) { const p = toWorld(e.clientX, e.clientY); addNode(p) } });
+    canvas.addEventListener('wheel', e => { if (e.target.closest('.inspector,.canvas-toolbar,#board-actions')) return; e.preventDefault(); const r = canvas.getBoundingClientRect(); if (e.ctrlKey || e.metaKey) zoom(Math.exp(-e.deltaY * .008), e.clientX - r.left, e.clientY - r.top); else { board.view.x -= e.deltaX; board.view.y -= e.deltaY; applyView(); clearTimeout(saveTimer); saveTimer = setTimeout(persist, 250) } }, { passive: false });
     document.addEventListener('keydown', e => { if (e.target.closest('input,textarea,select,[contenteditable]') || $('modal').open) return; const ctrl = e.ctrlKey || e.metaKey; if (ctrl && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return } if (ctrl && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return } if (ctrl && e.key.toLowerCase() === 's') { e.preventDefault(); persist(); toast('Saved in this browser. Export JSON for a portable backup.'); return } if ((e.key === ' ' || e.key === 'Enter') && e.target.closest('button,a,summary')) return; if (e.code === 'Space') { space = true; e.preventDefault() } if (e.key === 'Escape') { setTool('select'); select(null, null) } if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected() } if (!ctrl) { if (e.key.toLowerCase() === 'v') setTool('select'); if (e.key.toLowerCase() === 'h') setTool('pan'); if (e.key.toLowerCase() === 'c') setTool('link'); if (e.key.toLowerCase() === 'f') fit(); if (e.key.toLowerCase() === 'n') addNode(); if (e.key === 'Tab' && selected?.type === 'node' && board.mode === 'mind' && e.target.closest('#canvas')) { e.preventDefault(); addNode(null, selected.id) } if (e.key === 'Enter' && e.target.closest('[data-node]')) { e.preventDefault(); select('node', e.target.closest('[data-node]').dataset.node); focusIdeaLabel() } else if (e.key === 'Enter' && selected?.type === 'node' && e.target === canvas) { focusIdeaLabel() } } }); document.addEventListener('keyup', e => { if (e.code === 'Space') space = false }); window.addEventListener('blur', () => { space = false; drag = null; canvas.classList.remove('panning') });
     $('board-list').onclick = e => { const b = e.target.closest('[data-board]'); if (b) setBoard(b.dataset.board) }; $('board-search').oninput = renderList; $('new-board').onclick = newBoardDialog; $('rename-board').onclick = renameDialog; $('mobile-menu').onclick = () => $('sidebar').classList.toggle('open'); $('add-button').onclick = () => addNode(); $('empty-add').onclick = () => addNode(); $('select-tool').onclick = () => setTool('select'); $('pan-tool').onclick = () => setTool('pan'); $('link-tool').onclick = () => setTool(tool === 'link' ? 'select' : 'link'); $('delete-tool').onclick = deleteSelected; $('undo-button').onclick = undo; $('redo-button').onclick = redo; $('zoom-fit').onclick = fit; $('zoom-in').onclick = () => zoom(1.2); $('zoom-out').onclick = () => zoom(1 / 1.2);
     $('help-button').onclick = () => openModal('A little help goes a long way', `<p>Click an idea, table, or connection to edit it. Drag cards to arrange your canvas.</p><div class="shortcut-list"><span>Add idea / table</span><span class="keycap">N</span><span>Add a connected idea</span><span class="keycap">Tab</span><span>Connect two cards</span><span class="keycap">C</span><span>Select / Pan</span><span class="keycap">V / H</span><span>Pan temporarily</span><span class="keycap">Space + drag</span><span>Fit diagram</span><span class="keycap">F</span><span>Edit selected name</span><span class="keycap">Enter</span><span>Delete selected</span><span class="keycap">Delete</span><span>Undo / Redo</span><span class="keycap">Ctrl Z / Ctrl Shift Z</span><span>Zoom at pointer</span><span class="keycap">Ctrl + scroll</span></div><hr style="border:0;border-top:1px solid var(--line);margin:22px 0"><div class="help-note">Your work is saved in this browser. Export a JSON backup to move between devices or keep a lasting copy. SVG exports are images; JSON exports stay editable.<br><br>This static app does not connect to MySQL. Use a schema-only SQL export to bring in existing tables. Refreshes and edits stay in your diagram.</div>`);
@@ -5606,25 +6259,328 @@
 
     function boardImage() {
       if (!board.nodes.length) return canvasObjectsImage();
-      const bounds = board.nodes.reduce((r, n) => { const s = nodeSize(n); return { x: Math.min(r.x, n.x), y: Math.min(r.y, n.y), mx: Math.max(r.mx, n.x + s.w), my: Math.max(r.my, n.y + s.h) } }, { x: Infinity, y: Infinity, mx: -Infinity, my: -Infinity }); bounds.x -= 80; bounds.y -= 80; bounds.mx += 130; bounds.my += 100; const geometry = connectionGeometry(); const wires = board.edges.map(e => { const g = geometry(e), n = board.nodes.find(n => n.id === e.to); return `<path d="${g.path}" fill="none" stroke="${esc(board.mode === 'mind' ? n.color || colors[0] : '#99ae8e')}" stroke-width="2"${connectionStrokeAttributes(e, 2)}/>${board.mode === 'erd' ? `<g fill="none" stroke="#99ae8e" stroke-width="1.5">${endpoint(g.x1, g.y1, g.right ? 1 : -1, e.cardinality === 'N:M')}${endpoint(g.x2, g.y2, g.right ? -1 : 1, e.cardinality !== '1:1')}</g>` : ''}<text x="${g.mx}" y="${g.my}" text-anchor="middle" font-size="11" fill="#7e8b76">${esc(e.label || (board.mode === 'erd' ? e.cardinality : ''))}</text>` }).join('');
+      const bounds = board.nodes.reduce((r, n) => { const s = nodeSize(n); return { x: Math.min(r.x, n.x), y: Math.min(r.y, n.y), mx: Math.max(r.mx, n.x + s.w), my: Math.max(r.my, n.y + s.h) } }, { x: Infinity, y: Infinity, mx: -Infinity, my: -Infinity });
+      const geometry = connectionGeometry();
+      const wires = board.edges.map(e => {
+        const g = geometry(e);
+        if (!g) return '';
+        if (board.mode === 'erd') {
+          includeERDRoute(bounds, g);
+          return erdWireMarkup(e, g);
+        }
+        const n = board.nodes.find(n => n.id === e.to);
+        return `<path d="${g.path}" fill="none" stroke="${esc(n.color || colors[0])}" stroke-width="2"${connectionStrokeAttributes(e, 2)}/><text x="${g.mx}" y="${g.my}" text-anchor="middle" font-size="11" fill="#7e8b76">${esc(e.label || '')}</text>`;
+      }).join('');
+      bounds.x -= 80; bounds.y -= 80; bounds.mx += 130; bounds.my += 100;
       const nodes = board.nodes.map(n => { const s = nodeSize(n); if (board.mode === 'mind') { const layout = mindCardLayout(n), h = Math.max(s.h, layout.h), dark = editorTheme() === 'dark'; bounds.my = Math.max(bounds.my, n.y + h + 70); return `<g transform="translate(${n.x},${n.y})"><rect width="${s.w}" height="${h}" rx="12" fill="${n.root ? esc(n.color || '#2c6954') : dark ? '#172231' : 'white'}" stroke="${esc(n.color || colors[0])}"/>${mindTextSVG(layout.formattedTitle, layout.titleLines, layout.w, 17 + layout.titleSize, layout.titleLineHeight, layout.titleSize, layout.titleWeight, n.root ? 'white' : dark ? '#edf2fa' : '#23362f')}${mindTextSVG(layout.formattedNote, layout.noteLines, layout.w, 32 + layout.titleHeight, 15, 10, 400, n.root ? '#c1d5c4' : dark ? '#a9b8cc' : '#65745f')}${mindCardImageSVG(layout.images)}</g>` } return `<g transform="translate(${n.x},${n.y})"><rect width="260" height="${s.h}" rx="10" fill="white" stroke="#dbe3d9"/><path d="M10 0H250Q260 0 260 10V44H0V10Q0 0 10 0" fill="#eaf1e6"/><text x="15" y="28" font-size="13" font-weight="600">${esc(n.label.slice(0, 29))}</text>${n.fields.map((f, i) => `<text x="14" y="${70 + i * 31}" font-size="9" fill="${f.pk ? '#ad934b' : '#6b93ad'}">${f.pk ? 'PK' : isFK(n, f) ? 'FK' : ''}</text><text x="40" y="${70 + i * 31}" font-size="11">${esc(f.name.slice(0, 22))}</text><text x="247" y="${70 + i * 31}" font-size="9" fill="#8a9980" text-anchor="end">${esc(f.type.slice(0, 16))}</text>`).join('')}</g>` }).join('');
       Object.assign(bounds, canvasExportBounds(bounds));
       const content = `<g font-family="Segoe UI,Arial,sans-serif" fill="#23362f">${canvasElementsSVG()}${wires}${nodes}<text x="${bounds.x + 20}" y="${bounds.my - 20}" font-size="10" fill="#a0ac98">${esc(board.name)} · Made with Forma</text></g>`;
       const image = canvasImageData(bounds, content);
       return { ...image, width: Math.ceil(image.width), height: Math.ceil(image.height) };
     }
-    function splitSQL(s) { let parts = [], cur = '', depth = 0, quote = null; for (let i = 0; i < s.length; i++) { const c = s[i]; if (quote) { cur += c; if (c === '\\' && quote !== '`') { cur += s[++i] || ''; continue } if (c === quote) { if (s[i + 1] === quote) { cur += s[++i] } else quote = null } continue } if (c === '`' || c === "'" || c === '"') { quote = c; cur += c; continue } if (c === '(') depth++; if (c === ')') depth--; if (c === ',' && depth === 0) { parts.push(cur.trim()); cur = '' } else cur += c } if (cur.trim()) parts.push(cur.trim()); return parts }
-    function stripSQLComments(s) { let out = '', q = null; for (let i = 0; i < s.length; i++) { const c = s[i], d = s[i + 1]; if (q) { out += c; if (c === '\\' && q !== '`') { out += s[++i] || ''; continue } if (c === q) { if (d === q) out += s[++i]; else q = null } continue } if (c === '`' || c === "'" || c === '"') { q = c; out += c; continue } if (c === '/' && d === '*') { i += 2; while (i < s.length && !(s[i] === '*' && s[i + 1] === '/')) i++; i++; out += ' '; continue } if (c === '#' || c === '-' && d === '-' && /\s/.test(s[i + 2] || ' ')) { while (i < s.length && s[i] !== '\n') i++; out += '\n'; continue } out += c } return out }
+    function splitSQL(s, delimiter = ',', strict = false) {
+      const parts = [];
+      let start = 0, depth = 0, quote = null;
+      for (let i = 0; i < s.length; i++) {
+        const c = s[i];
+        if (quote) {
+          if (c === '\\' && quote !== '`') i++;
+          else if (c === quote) {
+            if (s[i + 1] === quote) i++;
+            else quote = null;
+          }
+          continue;
+        }
+        if (c === '`' || c === "'" || c === '"') quote = c;
+        else if (c === '(') depth++;
+        else if (c === ')') {
+          depth--;
+          if (strict && depth < 0) throw Error('Unexpected closing parenthesis.');
+        } else if (c === delimiter && depth === 0) {
+          parts.push(s.slice(start, i).trim());
+          start = i + 1;
+        }
+      }
+      if (strict && (quote || depth)) throw Error('Close all quotes and parentheses in the SQL.');
+      const last = s.slice(start).trim();
+      if (last || strict && delimiter === ',') parts.push(last);
+      return parts;
+    }
+    function stripSQLComments(s, strict = false) { let out = '', q = null; for (let i = 0; i < s.length; i++) { const c = s[i], d = s[i + 1]; if (q) { out += c; if (c === '\\' && q !== '`') { out += s[++i] || ''; continue } if (c === q) { if (d === q) out += s[++i]; else q = null } continue } if (c === '`' || c === "'" || c === '"') { q = c; out += c; continue } if (c === '/' && d === '*') { i += 2; while (i < s.length && !(s[i] === '*' && s[i + 1] === '/')) i++; if (strict && i >= s.length) throw Error('Close the SQL block comment.'); i++; out += ' '; continue } if (c === '#' || c === '-' && d === '-' && /\s/.test(s[i + 2] || ' ')) { while (i < s.length && s[i] !== '\n') i++; out += '\n'; continue } out += c } return out }
     function stripSQLStrings(s) { return s.replace(/'(?:''|\\.|[^'])*'|"(?:""|\\.|[^"])*"/g, "''") }
     function parseSQL(raw) { const s = stripSQLComments(raw), ident = '(?:`(?:``|[^`])+`|[A-Za-z_$][\\w$]*)', decode = v => v.trim().replace(/^`|`$/g, '').replace(/``/g, '`'), unqual = v => decode(v.split(/\s*\.\s*/).pop()); const re = new RegExp('\\bCREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?(' + ident + '(?:\\s*\\.\\s*' + ident + ')?)\\s*\\(', 'gi'); let match, tables = [], refs = [], warnings = []; while ((match = re.exec(s))) { if (tables.length >= 300) throw Error('Please import at most 300 tables at a time.'); const start = re.lastIndex; let depth = 1, q = null, end = start; for (; end < s.length; end++) { const c = s[end]; if (q) { if (c === '\\' && q !== '`') { end++; continue } if (c === q) { if (s[end + 1] === q) end++; else q = null } continue } if (c === '`' || c === "'" || c === '"') { q = c; continue } if (c === '(') depth++; if (c === ')' && !--depth) break } if (depth) throw Error('Unclosed CREATE TABLE definition. Check the SQL file.'); re.lastIndex = end + 1; const name = unqual(match[1]); if (tables.some(n => n.label === name)) throw Error('Duplicate table name: ' + name + '. Import one schema at a time.'); const t = { id: uid(), x: 0, y: 0, label: name, fields: [] }; let pks = []; for (const part of splitSQL(s.slice(start, end))) { if (/^PRIMARY\s+KEY\b/i.test(part)) { const km = part.match(/\(([^)]+)\)/); if (km) pks = splitSQL(km[1]).map(x => decode(x.replace(/\s+(ASC|DESC)$/i, ''))); continue } const fr = part.match(new RegExp('(?:CONSTRAINT\\s+' + ident + '\\s+)?FOREIGN\\s+KEY\\s*(?:' + ident + '\\s*)?\\(([^)]+)\\)\\s*REFERENCES\\s+(' + ident + '(?:\\s*\\.\\s*' + ident + ')?)\\s*\\(([^)]+)\\)', 'i')); if (fr) { refs.push({ child: name, parent: unqual(fr[2]), children: splitSQL(fr[1]).map(decode), parents: splitSQL(fr[3]).map(decode) }); continue } if (/^(?:UNIQUE|KEY|INDEX|CONSTRAINT|CHECK|FULLTEXT|SPATIAL)\b/i.test(part)) continue; const cm = part.match(new RegExp('^(' + ident + ')\\s+([\\s\\S]+)$')); if (!cm) { warnings.push('Skipped an unsupported definition in ' + name); continue } const rest = cm[2], tm = rest.match(/^([a-z]+(?:\s+(?:precision|varying))?)(\s*\((?:[^'"()]|'(?:''|\\.|[^'])*'|"(?:""|\\.|[^"])*")*\))?(\s+(?:unsigned|signed))?(\s+zerofill)?/i); if (!tm) { warnings.push('Skipped a column with an unrecognized type in ' + name); continue } const attributes = stripSQLStrings(rest.slice(tm[0].length)); const f = field(decode(cm[1]), tm[0].trim(), /\bPRIMARY\s+KEY\b/i.test(attributes), !/\bNOT\s+NULL\b|\bPRIMARY\s+KEY\b/i.test(attributes)); if (t.fields.some(x => x.name === f.name)) throw Error('Duplicate column ' + name + '.' + f.name); t.fields.push(f); const inline = rest.match(new RegExp('\\bREFERENCES\\s+(' + ident + ')\\s*\\(([^)]+)\\)', 'i')); if (inline) warnings.push('Inline REFERENCES in ' + name + ' is not treated as an enforced MySQL foreign key.') } t.fields.forEach(f => { if (pks.includes(f.name)) { f.pk = true; f.nullable = false } }); if (!t.fields.length) throw Error('No recognizable columns found in ' + name); tables.push(t) } if (!tables.length) throw Error('No CREATE TABLE definitions found. Use a MySQL structure-only SQL export.'); const edges = []; for (const r of refs) { const a = tables.find(t => t.label === r.parent), b = tables.find(t => t.label === r.child); if (!a || !b) { warnings.push('Skipped foreign key to a table outside this import: ' + r.parent); continue } if (r.parents.length !== 1 || r.children.length !== 1) { warnings.push('Composite foreign key on ' + r.child + ' was skipped; add it manually as labeled column links.'); continue } const af = a.fields.find(f => f.name === r.parents[0]), bf = b.fields.find(f => f.name === r.children[0]); if (!af || !bf) { warnings.push('Skipped foreign key with a missing column on ' + r.child); continue } edges.push({ id: uid(), from: a.id, to: b.id, fromField: af.id, toField: bf.id, cardinality: '1:N', label: '' }) } if (/\bALTER\s+TABLE\b/i.test(s)) warnings.push('ALTER TABLE statements are not imported. Export foreign keys inside CREATE TABLE definitions.'); warnings.push('Cardinalities default to 1:N; review unique constraints and optional relationships manually.'); return { tables, edges, warnings: [...new Set(warnings)] } }
     function arrangeTables(tables) { let y = 80; const cols = Math.min(4, Math.max(1, Math.ceil(Math.sqrt(tables.length)))); for (let i = 0; i < tables.length; i += cols) { const row = tables.slice(i, i + cols); row.forEach((t, j) => { t.x = 90 + j * 370; t.y = y }); y += Math.max(...row.map(t => 86 + t.fields.length * 31)) + 95 } }
+
+    function parseCreateTableSQL(raw, existingTables) {
+      if (raw.length > 5000000) throw Error('Use SQL smaller than 5 MB.');
+      const statements = splitSQL(stripSQLComments(raw, true), ';', true).filter(Boolean);
+      if (!statements.length) throw Error('Enter at least one CREATE TABLE statement.');
+      if (statements.length > 300) throw Error('Create at most 300 tables at a time.');
+      const ident = '(?:`(?:``|[^`])+`|"(?:""|[^"])+"|[A-Za-z_$][\\w$]*)';
+      const qualified = ident + '(?:\\s*\\.\\s*' + ident + ')?';
+      const quoted = /^(?:'(?:''|\\.|[^'])*'|"(?:""|\\.|[^"])*")/;
+      const decode = s => /^["`]/.test(s) ? s.slice(1, -1).replaceAll(s[0] + s[0], s[0]) : s;
+      const tableName = s => decode(s.match(new RegExp(ident, 'g')).at(-1));
+      const create = new RegExp('^CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?(' + qualified + ')\\s*(?=\\()', 'i');
+      const column = new RegExp('^(' + ident + ')\\s+');
+      const named = new RegExp('^CONSTRAINT\\s+(?:' + ident + '\\s+)?(?=PRIMARY\\b|FOREIGN\\b|UNIQUE\\b|CHECK\\b)', 'i');
+      const primary = /^PRIMARY\s+KEY\s*(?:USING\s+(?:BTREE|HASH)\s*)?(?=\()/i;
+      const foreign = new RegExp('^FOREIGN\\s+KEY\\s*(?:' + ident + '\\s*)?(?=\\()', 'i');
+      const references = new RegExp('^REFERENCES\\s+(' + qualified + ')\\s*(?=\\()', 'i');
+      const refActions = /^(?:(?:ON\s+(?:DELETE|UPDATE)\s+(?:NO\s+ACTION|SET\s+(?:NULL|DEFAULT)|CASCADE|RESTRICT)|MATCH\s+(?:FULL|PARTIAL|SIMPLE))\b\s*)*/i;
+      const typeName = /^(?:NATIONAL\s+(?:CHARACTER|CHAR|VARCHAR)(?:\s+VARYING)?|DOUBLE\s+PRECISION|(?:CHARACTER|CHAR|BINARY|BIT)\s+VARYING|LONG\s+(?:VARCHAR|VARBINARY)|BIGINT|BINARY|BIT|BLOB|BOOL(?:EAN)?|CHAR(?:ACTER)?|DATE(?:TIME)?|DEC(?:IMAL)?|DOUBLE|ENUM|FIXED|FLOAT[48]?|GEOMETRY(?:COLLECTION)?|INT(?:EGER|[1248])?|JSONB?|LINESTRING|LONG(?:BLOB|TEXT)|MEDIUM(?:BLOB|INT|TEXT)|MULTI(?:LINESTRING|POINT|POLYGON)|NCHAR|NUMERIC|NVARCHAR|POINT|POLYGON|REAL|SERIAL|BIGSERIAL|SET|SMALL(?:INT|SERIAL)|TEXT|TIME(?:STAMP)?|TINY(?:BLOB|INT|TEXT)|UUID|VARBINARY|VARCHAR|YEAR)\b/i;
+      const plainAttr = /^(?:NOT\s+NULL|NULL|PRIMARY\s+KEY|AUTO_INCREMENT|UNIQUE(?:\s+KEY)?|VISIBLE|INVISIBLE)\b/i;
+      const attrValue = /^(?:DEFAULT|COMMENT|ON\s+UPDATE|CHARACTER\s+SET|COLLATE|SRID)\s+/i;
+      const literalValue = /^(?:NULL\b|TRUE\b|FALSE\b|0x[\da-f]+\b|0b[01]+\b|[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)/i;
+      const timestamp = /^(?:CURRENT_TIMESTAMP|LOCALTIME|LOCALTIMESTAMP|NOW)\b(?:\s*\(\s*[0-6]?\s*\))?/i;
+      const otherKey = new RegExp('^(?:(?:INDEX|KEY|UNIQUE(?:\\s+(?:INDEX|KEY))?|(?:FULLTEXT|SPATIAL)(?:\\s+(?:INDEX|KEY))?)\\s*(?:' + ident + '\\s*)?(?:USING\\s+(?:BTREE|HASH)\\s*)?|CHECK\\s*)(?=\\()', 'i');
+      const tableOptions = new RegExp('^(?:(?:DEFAULT\\s+)?(?:ENGINE|(?:CHARACTER\\s+SET|CHARSET)|COLLATE|AUTO_INCREMENT|ROW_FORMAT|KEY_BLOCK_SIZE|COMMENT)\\s*=?\\s*(?:' + ident + '|\\d+|\'(?:\'\'|\\\\.|[^\'])*\')\\s*,?\\s*)*$', 'i');
+      const byName = new Map(existingTables.map(table => [table.label.toLowerCase(), table]));
+      const tables = [], refs = [], edges = [], warnings = new Set();
+
+      // Consume one balanced group. The input has already been checked for unmatched quotes and parentheses.
+      function group(s) {
+        let depth = 0;
+        const token = /'(?:''|\\.|[^'])*'|"(?:""|\\.|[^"])*"|`(?:``|[^`])*`|[()]/g;
+        for (const match of s.matchAll(token)) {
+          if (match[0] === '(') depth++;
+          if (match[0] === ')' && --depth === 0) return [s.slice(1, match.index), s.slice(match.index + 1).trimStart()];
+        }
+        throw Error('Expected a parenthesized SQL definition.');
+      }
+      function columns(s, ordered = false) {
+        const [body, rest] = group(s), names = new Set();
+        for (let part of splitSQL(body, ',', true)) {
+          if (ordered) part = part.replace(/\s+(?:ASC|DESC)$/i, '');
+          if (!new RegExp('^' + ident + '$').test(part)) throw Error('Expected a column name in (' + body + ').');
+          const name = decode(part).toLowerCase();
+          if (names.has(name)) throw Error('Repeated column in key: ' + name + '.');
+          names.add(name);
+        }
+        return [[...names], rest];
+      }
+      function reference(s, children, child) {
+        const m = s.match(references);
+        if (!m) throw Error('Expected REFERENCES table (column) in ' + child.label + '.');
+        const [parents, rest] = columns(s.slice(m[0].length));
+        if (parents.length !== children.length) throw Error('Foreign key column counts differ in ' + child.label + '.');
+        refs.push({ child, parent: tableName(m[1]), children, parents });
+        return rest.slice(rest.match(refActions)[0].length);
+      }
+
+      for (const [i, statement] of statements.entries()) {
+        const header = statement.match(create);
+        if (!header) throw Error('Statement ' + (i + 1) + ' must be CREATE TABLE name (columns).');
+        const name = tableName(header[1]), key = name.toLowerCase();
+        if (name.length > 150 || !name.trim()) throw Error('Table names must contain 1 to 150 characters.');
+        if (byName.has(key)) throw Error('A table named ' + name + ' already exists in this diagram or SQL.');
+        const [body, options] = group(statement.slice(header[0].length));
+        if (!tableOptions.test(options)) throw Error('Unsupported or invalid table options for ' + name + '.');
+        const table = { id: uid(), label: name, x: 0, y: 0, fields: [] };
+        const fields = new Map();
+        let primaryKey;
+        const setPrimary = names => {
+          if (primaryKey) throw Error('More than one primary key in ' + name + '.');
+          primaryKey = names;
+        };
+
+        for (const part of splitSQL(body, ',', true)) {
+          const definition = part.replace(named, ''), pk = definition.match(primary), fk = definition.match(foreign);
+          if (pk) {
+            const [names, rest] = columns(definition.slice(pk[0].length), true);
+            if (rest && !/^USING\s+(?:BTREE|HASH)$/i.test(rest)) throw Error('Invalid PRIMARY KEY in ' + name + '.');
+            setPrimary(names);
+            continue;
+          }
+          if (fk) {
+            const [names, rest] = columns(definition.slice(fk[0].length));
+            if (reference(rest, names, table)) throw Error('Invalid FOREIGN KEY options in ' + name + '.');
+            continue;
+          }
+          const ignored = definition.match(otherKey);
+          if (ignored) {
+            const [expression, rest] = group(definition.slice(ignored[0].length));
+            if (!expression.trim() || rest && !/^(?:USING\s+(?:BTREE|HASH)|(?:NOT\s+)?ENFORCED)$/i.test(rest)) {
+              throw Error('Invalid index or CHECK constraint in ' + name + '.');
+            }
+            continue;
+          }
+          const m = part.match(column);
+          if (!m) throw Error('Expected a column name and type in ' + name + '. Check the commas.');
+          const col = decode(m[1]), colKey = col.toLowerCase(), rest = part.slice(m[0].length);
+          if (fields.has(colKey)) throw Error('Duplicate column ' + name + '.' + col + '.');
+          const base = rest.match(typeName)?.[0];
+          if (!base) throw Error('Unrecognized SQL type for ' + name + '.' + col + '.');
+          let attributes = rest.slice(base.length).trimStart(), type = base;
+          const listType = /^(?:ENUM|SET)$/i.test(base);
+          const lengthRequired = /^(?:N?VARCHAR|VARBINARY|NATIONAL\s+VARCHAR|(?:NATIONAL\s+)?(?:CHAR|CHARACTER|BINARY|BIT)\s+VARYING)$/i.test(base);
+          if (attributes.startsWith('(')) {
+            const [params, tail] = group(attributes);
+            const paramsValid = splitSQL(params, ',', true).every(p => listType ? p.match(quoted)?.[0] === p : /^\d+$/.test(p));
+            const precision = /^(?:DEC(?:IMAL)?|DOUBLE(?:\s+PRECISION)?|FIXED|FLOAT|NUMERIC|REAL)$/i.test(base);
+            if (!paramsValid || !listType && !new RegExp(precision ? '^\\s*\\d+(?:\\s*,\\s*\\d+)?\\s*$' : '^\\s*\\d+\\s*$').test(params)) {
+              throw Error('Invalid type parameters for ' + name + '.' + col + '.');
+            }
+            type += '(' + params + ')';
+            attributes = tail;
+          } else if (listType || lengthRequired) {
+            throw Error('Enter type parameters for ' + name + '.' + col + '.');
+          }
+          const suffix = attributes.match(/^(?:UNSIGNED|SIGNED|ZEROFILL|(?:WITH|WITHOUT)\s+TIME\s+ZONE)\b(?:\s+ZEROFILL\b)?/i);
+          if (suffix) { type += ' ' + suffix[0]; attributes = attributes.slice(suffix[0].length).trimStart(); }
+          if (!col.trim() || col.length > 150 || type.length > 500) throw Error('Column name or type is too long or empty in ' + name + '.');
+          let nullable = true;
+          while (attributes) {
+            const flag = attributes.match(plainAttr)?.[0];
+            const value = attributes.match(attrValue)?.[0];
+            const expression = attributes.match(/^(?:(?:GENERATED\s+ALWAYS\s+)?AS|CHECK)\s*(?=\()/i)?.[0];
+            if (flag) {
+              if (/^PRIMARY/i.test(flag)) setPrimary([colKey]);
+              if (/^NOT/i.test(flag)) nullable = false;
+              attributes = attributes.slice(flag.length).trimStart();
+            } else if (value) {
+              const tail = attributes.slice(value.length);
+              let literal;
+              if (/^DEFAULT/i.test(value)) {
+                if (tail.startsWith('(')) {
+                  const [expression, remaining] = group(tail);
+                  if (!expression.trim()) throw Error('Expected a default expression for ' + name + '.' + col + '.');
+                  attributes = remaining;
+                  continue;
+                }
+                literal = tail.match(quoted)?.[0] || tail.match(literalValue)?.[0] || tail.match(timestamp)?.[0] ||
+                  tail.match(/^(?:x'[0-9a-f]+'|b'[01]+')/i)?.[0];
+              } else if (/^ON/i.test(value)) {
+                literal = tail.match(timestamp)?.[0];
+              } else if (/^COMMENT/i.test(value)) {
+                literal = tail.match(quoted)?.[0];
+              } else if (/^SRID/i.test(value)) {
+                literal = tail.match(/^\d+\b/)?.[0];
+              } else {
+                literal = tail.match(new RegExp('^' + ident))?.[0];
+              }
+              if (!literal) throw Error('Invalid value after ' + value.trim() + ' on ' + name + '.' + col + '.');
+              attributes = tail.slice(literal.length).trimStart();
+            } else if (expression) {
+              attributes = group(attributes.slice(expression.length))[1].replace(/^(?:VIRTUAL|STORED|(?:NOT\s+)?ENFORCED)\b\s*/i, '');
+            } else if (references.test(attributes)) {
+              attributes = reference(attributes, [colKey], table);
+            } else {
+              throw Error('Unsupported or invalid column definition for ' + name + '.' + col + '. Check the commas and column options.');
+            }
+          }
+          fields.set(colKey, field(col, type, false, nullable));
+        }
+        for (const col of primaryKey || []) {
+          const f = fields.get(col);
+          if (!f) throw Error('Primary key references missing column ' + name + '.' + col + '.');
+          f.pk = true;
+          f.nullable = false;
+        }
+        if (!fields.size || fields.size > 500) throw Error('A table needs 1 to 500 columns.');
+        table.fields = [...fields.values()];
+        tables.push(table);
+        byName.set(key, table);
+      }
+
+      const keys = new Set();
+      for (const { parent, child, parents, children } of refs) {
+        const parentTable = byName.get(parent.toLowerCase());
+        children.forEach((col, index) => {
+          const to = child.fields.find(f => f.name.toLowerCase() === col);
+          if (!to) throw Error('Foreign key references missing column ' + child.label + '.' + col + '.');
+          if (!parentTable) {
+            warnings.add(parent);
+            return;
+          }
+          const from = parentTable.fields.find(f => f.name.toLowerCase() === parents[index]);
+          if (!from) throw Error('Foreign key references missing column ' + parentTable.label + '.' + parents[index] + '.');
+          const key = JSON.stringify([parentTable.id, from.id, child.id, to.id]);
+          if (keys.has(key)) return;
+          keys.add(key);
+          edges.push({ id: uid(), from: parentTable.id, to: child.id, fromField: from.id,
+            toField: to.id, cardinality: '1:N', label: '', ...(children.length > 1 && { composite: true }) });
+        });
+      }
+      return { tables, edges, missingTables: [...warnings] };
+    }
+
+    function placeSQLTables(tables) {
+      const existing = new Map(Array.from($('nodes').children, el => [el.dataset.node, el]));
+      const occupied = board.nodes.map(n => ({ ...nodeSize(n, existing.get(n.id) ?? null), x: n.x, y: n.y }));
+      const center = centerPoint(), margin = 42;
+      const columns = Math.min(4, Math.ceil(Math.sqrt(tables.length)));
+      for (const [i, table] of tables.entries()) {
+        const { w, h } = nodeSize(table, null);
+        const headerWidth = mindTextWidth(table.label, '650 13px Segoe UI');
+        const height = h + 20 * Math.ceil(headerWidth / 190);
+        const x = Math.round(center.x - w / 2 + i % columns * (w + 110));
+        let y = Math.round(center.y - Math.min(260, h) / 2);
+        const neighbors = occupied.filter(rect => x < rect.x + rect.w + margin && x + w + margin > rect.x)
+          .sort((a, b) => a.y - b.y);
+        for (const rect of neighbors) {
+          if (y + height + margin <= rect.y) break;
+          if (y < rect.y + rect.h + margin) y = rect.y + rect.h + margin;
+        }
+        if (Math.abs(x) > 100000 || Math.abs(y) > 100000) throw Error('Move the canvas closer to your tables or add a smaller batch.');
+        table.x = x;
+        table.y = y;
+        occupied.push({ x, y, w, h: height });
+      }
+    }
+
+    function createTableSQLDialog() {
+      openModal('Create Table (SQL)', `<p>Add tables and their foreign-key relationships to <strong>${esc(board.name)}</strong>.</p>
+        <div class="form-group"><label for="create-table-sql">CREATE TABLE statements</label>
+        <textarea class="sql-area" id="create-table-sql" spellcheck="false" autofocus
+          aria-describedby="create-table-sql-error" placeholder="CREATE TABLE comments (&#10;  id BIGINT PRIMARY KEY,&#10;  body TEXT NOT NULL&#10;);"></textarea></div>
+        <div class="status-error" id="create-table-sql-error" role="alert"></div>
+        <div class="dialog-actions"><button id="create-table-sql-cancel">Cancel</button>
+        <button class="primary" id="create-table-sql-submit">Add to diagram</button></div>`);
+      const input = $('create-table-sql'), error = $('create-table-sql-error');
+      input.oninput = () => { error.textContent = ''; input.removeAttribute('aria-invalid') };
+      $('create-table-sql-cancel').onclick = closeModal;
+      $('create-table-sql-submit').onclick = () => {
+        let result;
+        try {
+          result = parseCreateTableSQL(input.value, board.nodes);
+          if (board.nodes.length + result.tables.length > 3000 || board.edges.length + result.edges.length > 10000) {
+            throw Error('This diagram can contain up to 3,000 tables and 10,000 relationships.');
+          }
+          placeSQLTables(result.tables);
+        } catch (err) {
+          error.textContent = err.message;
+          input.setAttribute('aria-invalid', 'true');
+          input.focus();
+          return;
+        }
+        const { tables, edges, missingTables } = result;
+        checkpoint();
+        board.nodes.push(...tables);
+        board.edges.push(...edges);
+        closeModal();
+        setTool('select');
+        selected = { type: 'node', id: tables[0].id };
+        render();
+        const first = tables[0], view = board.view;
+        const top = first.y * view.z + view.y, left = first.x * view.z + view.x;
+        const rightmost = Math.max(...tables.map(table => (table.x + 260) * view.z + view.x));
+        const lowest = Math.max(...tables.map(table => (table.y + 60) * view.z + view.y));
+        if (top < 0 || lowest > canvas.clientHeight - 80 || left < 0 || rightmost > canvas.clientWidth) fit();
+        changed();
+        const unresolved = missingTables.length ? ' · Referenced tables missing: ' + missingTables.slice(0, 3).join(', ') + (missingTables.length > 3 ? '…' : '') : '';
+        toast(`Added ${itemCount(tables.length, 'table')} and ${itemCount(edges.length, 'relationship')}${unresolved}`);
+      };
+    }
+    $('create-table-sql-button').onclick = createTableSQLDialog;
+
     function sqlDialog(text = '') { openModal('Bring your schema to life', `<p>Paste MySQL <code>CREATE TABLE</code> statements, or choose a structure-only <code>.sql</code> file. The imported schema opens as a new ERD board.</p><div class="notice-banner">Imports table names, column types, primary keys, and single-column foreign keys declared inside CREATE TABLE. Defaults, indexes, triggers, and advanced constraints are not preserved.</div><textarea class="sql-area" id="sql-input" spellcheck="false" aria-label="MySQL CREATE TABLE SQL" placeholder="CREATE TABLE users (&#10;  id BIGINT UNSIGNED NOT NULL,&#10;  name VARCHAR(100),&#10;  PRIMARY KEY (id)&#10;);">${esc(text)}</textarea><div id="sql-error" class="status-error" role="alert"></div><div class="dialog-actions"><button id="choose-sql">${ico('upload')}Choose file</button><button class="primary" id="parse-sql">Preview import ${ico('arrow')}</button></div>`); $('choose-sql').onclick = () => { $('file-input').accept = '.sql,text/plain'; $('file-input').value = ''; $('file-input').click() }; $('parse-sql').onclick = () => { try { const raw = $('sql-input').value; if (raw.length > 5000000) throw Error('Use a schema-only file smaller than 5 MB.'); const parsed = parseSQL(raw); sqlPreview(parsed, raw) } catch (e) { $('sql-error').textContent = e.message } } }
     function sqlPreview(parsed, raw) { openModal('Your schema, ready to map', `<p>Found <strong>${parsed.tables.length} tables</strong> and <strong>${parsed.edges.length} foreign-key relationships</strong>. A new board will be created.</p><div class="form-group"><label for="sql-board-name">BOARD NAME</label><input id="sql-board-name" value="Imported database" maxlength="150"></div><div class="help-note" style="max-height:150px;overflow:auto">${parsed.tables.map(t => `${esc(t.label)} <span style="opacity:.6">· ${t.fields.length} columns</span>`).join('<br>')}</div>${parsed.warnings.length ? `<div class="notice-banner" style="margin-top:13px;max-height:170px;overflow:auto">${parsed.warnings.map(w => esc(w)).join('<br><br>')}</div>` : ''}<div class="dialog-actions"><button id="sql-back">Back</button><button class="primary" id="sql-confirm">Create ERD board</button></div>`); $('sql-back').onclick = () => sqlDialog(raw); $('sql-confirm').onclick = () => { arrangeTables(parsed.tables); const b = { id: uid(), name: $('sql-board-name').value.trim() || 'Imported database', mode: 'erd', nodes: parsed.tables, edges: parsed.edges, view: { x: 0, y: 0, z: 1 }, updated: Date.now() }; workspace.boards.push(b); closeModal(); setBoard(b.id); toast('Schema imported. Review the relationships before exporting SQL.') } }
     $('sql-button').onclick = () => sqlDialog();
     function importDialog() { openModal('Pick up where you left off', `<p>Bring in a Forma backup or turn an existing MySQL schema into a diagram.</p><div class="export-options"><button id="import-json">${ico('upload')}Forma backup <small>JSON</small></button><button id="import-codebase">${ico('code')}Codebase folder <small>MIND MAP</small></button><button id="import-sql">${ico('code')}MySQL schema <small>SQL</small></button></div><div class="help-note" style="margin-top:18px">Imported boards are added to your workspace. Existing boards stay in place. SQL files are read locally and are never executed.</div>`); $('import-json').onclick = () => { $('file-input').accept = '.json,application/json'; $('file-input').value = ''; $('file-input').click() }; $('import-sql').onclick = () => sqlDialog(); $('import-codebase').onclick = codeScanDialog }
     $('import-button').onclick = importDialog; $('file-input').onchange = async e => { const f = e.target.files[0]; if (!f) return; if (f.size > 5000000) { toast('Choose a file smaller than 5 MB.'); return } try { const text = await f.text(); if (f.name.toLowerCase().endsWith('.sql')) { sqlDialog(text); return } const w = validateWorkspace(JSON.parse(text)); const added = w.boards.map(b => ({ ...b, id: uid(), name: b.name, updated: Date.now() })); workspace.boards.push(...added); closeModal(); setBoard(added[0].id); toast(`Imported ${added.length} board${added.length === 1 ? '' : 's'}`) } catch (err) { toast(err instanceof SyntaxError ? 'This is not a valid JSON backup.' : err.message) } finally { e.target.value = '' } };
     const qi = s => '`' + String(s).replace(/`/g, '``') + '`';
-    function generateSQL() { const warnings = [], statements = []; if (!board.nodes.length) throw Error('Add at least one table first.'); for (const t of board.nodes) { if (!t.fields.length) throw Error(t.label + ' has no columns.'); const names = new Set; for (const f of t.fields) { if (!f.name.trim() || names.has(f.name.toLowerCase())) throw Error('Check duplicate or empty columns in ' + t.label); names.add(f.name.toLowerCase()); if (!/^[a-z][a-z0-9_ ]*(?:\((?:\d+(?:\s*,\s*\d+)?|'(?:''|\\.|[^'])*'(?:\s*,\s*'(?:''|\\.|[^'])*')*)\))?(?:\s+(?:UNSIGNED|SIGNED))?(?:\s+ZEROFILL)?$/i.test(f.type.trim())) throw Error('Unsupported SQL type for ' + t.label + '.' + f.name + '. Use a plain MySQL column type.') } const pk = t.fields.filter(f => f.pk); statements.push(`CREATE TABLE ${qi(t.label)} (\n${t.fields.map(f => '  ' + qi(f.name) + ' ' + f.type + (f.pk || !f.nullable ? ' NOT NULL' : ' NULL')).concat(pk.length ? ['  PRIMARY KEY (' + pk.map(f => qi(f.name)).join(', ') + ')'] : []).join(',\n')}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`) } for (const e of board.edges) { const a = board.nodes.find(n => n.id === e.from), b = board.nodes.find(n => n.id === e.to), af = a.fields.find(f => f.id === e.fromField), bf = b.fields.find(f => f.id === e.toField); if (e.cardinality === 'N:M') { warnings.push(`Skipped ${a.label} → ${b.label}: many-to-many needs a junction table.`); continue } if (a.fields.filter(f => f.pk).length !== 1 || !af.pk) { warnings.push(`Skipped ${a.label}.${af.name} → ${b.label}.${bf.name}: source must be the sole primary-key column for this exporter.`); continue } if (af.type.trim().toUpperCase() !== bf.type.trim().toUpperCase()) { warnings.push(`Skipped ${b.label}.${bf.name}: source and target types differ.`); continue } if (e.cardinality === '1:1') statements.push(`ALTER TABLE ${qi(b.label)} ADD UNIQUE (${qi(bf.name)});`); statements.push(`ALTER TABLE ${qi(b.label)} ADD FOREIGN KEY (${qi(bf.name)}) REFERENCES ${qi(a.label)} (${qi(af.name)});`) } return { sql: '-- Forma: MySQL schema draft. Review before running.\n-- Includes modeled columns, primary keys, and supported foreign keys only.\n-- Defaults, AUTO_INCREMENT, existing indexes, and referential actions are not preserved.\n' + (warnings.length ? warnings.map(w => '-- ' + w.replace(/[\r\n]/g, ' ')).join('\n') + '\n' : '') + '\n' + statements.join('\n\n') + '\n', warnings } }
+    function generateSQL() { const warnings = [], statements = []; if (!board.nodes.length) throw Error('Add at least one table first.'); for (const t of board.nodes) { if (!t.fields.length) throw Error(t.label + ' has no columns.'); const names = new Set; for (const f of t.fields) { if (!f.name.trim() || names.has(f.name.toLowerCase())) throw Error('Check duplicate or empty columns in ' + t.label); names.add(f.name.toLowerCase()); if (!/^[a-z][a-z0-9_ ]*(?:\((?:\d+(?:\s*,\s*\d+)?|'(?:''|\\.|[^'])*'(?:\s*,\s*'(?:''|\\.|[^'])*')*)\))?(?:\s+(?:UNSIGNED|SIGNED))?(?:\s+ZEROFILL)?$/i.test(f.type.trim())) throw Error('Unsupported SQL type for ' + t.label + '.' + f.name + '. Use a plain MySQL column type.') } const pk = t.fields.filter(f => f.pk); statements.push(`CREATE TABLE ${qi(t.label)} (\n${t.fields.map(f => '  ' + qi(f.name) + ' ' + f.type + (f.pk || !f.nullable ? ' NOT NULL' : ' NULL')).concat(pk.length ? ['  PRIMARY KEY (' + pk.map(f => qi(f.name)).join(', ') + ')'] : []).join(',\n')}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`) } for (const e of board.edges) { const a = board.nodes.find(n => n.id === e.from), b = board.nodes.find(n => n.id === e.to), af = a.fields.find(f => f.id === e.fromField), bf = b.fields.find(f => f.id === e.toField); if (erdEnds(e).every(marker => marker === 'many' || marker === 'optionalMany')) { warnings.push(`Skipped ${a.label} → ${b.label}: many-to-many needs a junction table.`); continue } if (e.composite) { warnings.push(`Skipped ${a.label} → ${b.label}: composite foreign key needs manual SQL.`); continue } if (a.fields.filter(f => f.pk).length !== 1 || !af.pk) { warnings.push(`Skipped ${a.label}.${af.name} → ${b.label}.${bf.name}: source must be the sole primary-key column for this exporter.`); continue } if (af.type.trim().toUpperCase() !== bf.type.trim().toUpperCase()) { warnings.push(`Skipped ${b.label}.${bf.name}: source and target types differ.`); continue } if (['one', 'optionalOne'].includes(erdEnds(e)[1])) statements.push(`ALTER TABLE ${qi(b.label)} ADD UNIQUE (${qi(bf.name)});`); statements.push(`ALTER TABLE ${qi(b.label)} ADD FOREIGN KEY (${qi(bf.name)}) REFERENCES ${qi(a.label)} (${qi(af.name)});`) } return { sql: '-- Forma: MySQL schema draft. Review before running.\n-- Includes modeled columns, primary keys, and supported foreign keys only.\n-- Defaults, AUTO_INCREMENT, existing indexes, and referential actions are not preserved.\n' + (warnings.length ? warnings.map(w => '-- ' + w.replace(/[\r\n]/g, ' ')).join('\n') + '\n' : '') + '\n' + statements.join('\n\n') + '\n', warnings } }
     function sqlExportDialog() { try { const { sql, warnings } = generateSQL(); openModal('Review your SQL draft', `<p>A starting schema based on your diagram. Review it in a development database before use.</p><div class="notice-banner">Defaults, AUTO_INCREMENT, secondary indexes, and referential actions are not included.${warnings.length ? '<br><br>' + warnings.map(w => esc(w)).join('<br>') : ''}</div><textarea class="sql-area" id="sql-output" readonly aria-label="Generated SQL">${esc(sql)}</textarea><div class="dialog-actions"><button id="sql-copy">Copy SQL</button><button class="primary" id="sql-download">Download SQL</button></div>`); $('sql-download').onclick = () => { download(filename() + '.sql', sql, 'application/sql'); closeModal(); toast('SQL draft downloaded') }; $('sql-copy').onclick = async () => { try { await navigator.clipboard.writeText(sql); toast('SQL copied') } catch (e) { $('sql-output').select(); toast('Select the SQL and press Ctrl+C to copy.') } } } catch (e) { toast(e.message) } }
     // Canvas text, shapes, page settings, and SVG support; all fonts are local system fonts.
     function canvasElementMarkup(e) {
@@ -6758,13 +7714,42 @@
     const diagramBaseRender = render, diagramBaseChanged = changed, diagramBaseSelect = select, diagramBaseSetBoard = setBoard, diagramBaseInspector = renderInspector, diagramBaseElements = renderCanvasElements, diagramBaseWires = renderWires, diagramBaseDelete = deleteSelected, diagramBaseSVG = canvasElementsSVG, diagramBaseBounds = canvasExportBounds, diagramBaseApplyView = applyView, diagramBaseSetTool = setTool;
     render = function () { diagramBaseRender(); $('link-tool').disabled = !!board.mockup; renderDiagramBar(); renderDiagramGrid(); $('empty-add').innerHTML = $('add-button').innerHTML; if (!board.diagram) { $('add-button').onclick = () => board.mockup ? componentLibrary() : addNode(); $('empty-add').onclick = $('add-button').onclick } };
     changed = function () { diagramBaseChanged(); renderDiagramBar() };
-    select = function (type, id) { diagramSelection = new Set(type === 'element' && id ? [id] : []); diagramBaseSelect(type, id); renderDiagramBar() };
-    setBoard = function (id) { diagramSelection.clear(); diagramGroupDrag = null; diagramBaseSetBoard(id) };
+    select = function (type, id) { relationshipDetailsId = null; diagramSelection = new Set(type === 'element' && id ? [id] : []); diagramBaseSelect(type, id); renderDiagramBar() };
+    setBoard = function (id) { relationshipDetailsId = null; diagramSelection.clear(); diagramGroupDrag = null; diagramBaseSetBoard(id) };
     setTool = function (t) { diagramBaseSetTool(t); renderDiagramBar(); if (board.diagram && t === 'link') $('canvas-hint').innerHTML = '<span>Select a source shape, then a destination. Esc cancels.</span>' };
-    renderInspector = function () { if (selected?.type === 'element-link') renderDiagramLinkInspector(); else if (selectedDiagramElements().length > 1) renderDiagramSelectionInspector(); else diagramBaseInspector() };
-    renderCanvasElements = function () { diagramBaseElements(); if (board.diagram) { const ids = new Set(selectedDiagramElements().map(e => e.id)); $('elements').querySelectorAll('[data-element]').forEach(el => { el.classList.toggle('diagram-selected', ids.has(el.dataset.element)); el.classList.toggle('diagram-link-source', tool === 'link' && el.dataset.element === linkSource) }); renderWires() } };
-    renderWires = function () { diagramBaseWires(); if (board.diagram) $('wires').insertAdjacentHTML('beforeend', diagramLinksSVG(board, true, 'editor')) };
-    applyView = function () { diagramBaseApplyView(); renderDiagramGrid() };
+    renderInspector = function () {
+      const panel = $('inspector');
+      panel.classList.remove('erd-toolbar');
+      const relationship = board.mode === 'erd' && selected?.type === 'edge' && board.edges.find(edge => edge.id === selected.id);
+      if (relationship && relationshipDetailsId !== relationship.id) renderERDToolbar(relationship);
+      else if (selected?.type === 'element-link') renderDiagramLinkInspector();
+      else if (selectedDiagramElements().length > 1) renderDiagramSelectionInspector();
+      else diagramBaseInspector();
+      if (!relationship) relationshipDetailsId = null;
+      scheduleInspectorPosition();
+    };
+    renderCanvasElements = function () {
+      diagramBaseElements();
+      if (board.diagram) {
+        const ids = new Set(selectedDiagramElements().map(e => e.id));
+        $('elements').querySelectorAll('[data-element]').forEach(el => {
+          el.classList.toggle('diagram-selected', ids.has(el.dataset.element));
+          el.classList.toggle('diagram-link-source', tool === 'link' && el.dataset.element === linkSource);
+        });
+        renderWires();
+      }
+      scheduleInspectorPosition();
+    };
+    renderWires = function () {
+      diagramBaseWires();
+      if (board.diagram) $('wires').insertAdjacentHTML('beforeend', diagramLinksSVG(board, true, 'editor'));
+      scheduleInspectorPosition();
+    };
+    applyView = function () {
+      diagramBaseApplyView();
+      renderDiagramGrid();
+      scheduleInspectorPosition();
+    };
     canvasElementsSVG = function (elements = board.elements || [], prefix = 'forma') { return diagramBaseSVG(elements, prefix) + (board.diagram && elements === board.elements ? diagramLinksSVG(board, false, prefix) : '') };
     canvasExportBounds = function (bounds) { const result = diagramBaseBounds(bounds); if (board.diagram && !board.page?.width) for (const link of board.elementLinks || []) { const g = diagramConnectorGeometry(link, board.elements); if (!g) continue; for (const p of g.points) { result.x = Math.min(result.x, p.x - 40); result.y = Math.min(result.y, p.y - 40); result.mx = Math.max(result.mx, p.x + 40); result.my = Math.max(result.my, p.y + 40) } if (link.label) { const width = link.label.length * 8; result.x = Math.min(result.x, g.label.x - width / 2 - 12); result.mx = Math.max(result.mx, g.label.x + width / 2 + 12) } } return result };
     deleteSelected = function () {
@@ -7165,7 +8150,25 @@
       $('code-start-over').onclick = codeScanDialog;
       $('code-create').onclick = () => { result.name = $('code-board-name').value.trim().slice(0, 150) || result.name; validateWorkspace({ version: 1, active: result.id, boards: [result] }); workspace.boards.push(result); closeModal(); setBoard(result.id); toast('Codebase map created. Click a file to read its summary.') };
     }
-    $('reflow-mind-button').onclick = () => { if (board.mode !== 'mind') return; checkpoint(); reflowMindBoard(board); render(); changed(); fit(); toast('Ideas reflowed in branch order.') };
+    $('reflow-mind-button').onclick = () => {
+      if (board.mode === 'design' || !board.nodes.length) return;
+      if (board.mode === 'erd') {
+        if (!reflowERDBoard(board, checkpoint)) {
+          toast('No tables moved.');
+          return;
+        }
+        render();
+        changed();
+        toast('Overlapping tables spaced out.');
+        return;
+      }
+      checkpoint();
+      reflowMindBoard(board);
+      render();
+      changed();
+      fit();
+      toast('Ideas reflowed in branch order.');
+    };
     $('scan-code-button').onclick = codeScanDialog;
     $('code-folder-input').onchange = e => { selectCodeFiles(e.target.files); e.target.value = '' };
     $('code-files-input').onchange = e => { selectCodeFiles(e.target.files); e.target.value = '' };
@@ -7298,6 +8301,9 @@
     $('modal').addEventListener('close', () => $('modal').classList.remove('docs-dialog'));
 
 
+    const inspectorResize = new ResizeObserver(scheduleInspectorPosition);
+    inspectorResize.observe($('inspector'));
+    inspectorResize.observe(canvas);
     render(); requestAnimationFrame(() => fit()); if (!storageAvailable) { updateSaveStatus(false); setTimeout(() => toast('Browser storage could not be read. Export JSON to keep a backup.'), 600) } else persist();
     window.addEventListener('beforeunload', () => { clearTimeout(saveTimer); persist() }); let resizeTimer; window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { applyView(); renderWires() }, 150) });
   </script>
